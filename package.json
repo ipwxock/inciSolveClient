@@ -15,9 +15,6 @@
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
   },
-  "dependencies": {
-    "vue": "^3.5.12"
-  },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
     "@types/jsdom": "^21.1.7",
@@ -42,5 +39,9 @@
     "vite-plugin-vue-devtools": "^7.5.4",
     "vitest": "^2.1.4",
     "vue-tsc": "^2.1.10"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "vue-router": "^4.5.0"
   }
 }

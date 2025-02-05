@@ -2,8 +2,6 @@
 
 #app {
   max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
   font-weight: normal;
 }
 
@@ -17,19 +15,33 @@ a,
 
 @media (hover: hover) {
   a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+    background-color: hsla(0, 0%, 55%, 0.2);
   }
 }
 
 @media (min-width: 1024px) {
   body {
     display: flex;
-    place-items: center;
   }
 
   #app {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
   }
+}
+
+.is-valid {
+  border: 3px solid green;
+}
+
+.is-invalid {
+  border: 3px solid red;
+}
+
+.hertzel {
+  border: 3px solid red;
+}
+
+.zevrup {
+  border: 3px solid green;
 }
