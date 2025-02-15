@@ -29,9 +29,6 @@
                 <a :href="'/customers/' + customerData.customer.id" class="btn btn-primary me-1"
                   >Ver Detalle</a
                 >
-                <button @click="showModal(customerData.customer.id!)" class="btn btn-danger">
-                  Eliminar
-                </button>
               </td>
             </tr>
           </tbody>
@@ -66,35 +63,6 @@ const fetchCustomers = async () => {
 }
 
 onMounted(fetchCustomers)
-
-const showModal = (customerId?: number) => {
-  if (customerId === undefined || customerId === null) {
-    console.error('Error: El ID del cliente es inválido.')
-    return // Evita ejecutar código innecesario
-  }
-
-  if (confirm('¿Estás seguro de eliminar este cliente?')) {
-    deleteCustomer(customerId)
-  }
-}
-
-const deleteCustomer = async (customerId?: number) => {
-  if (customerId === undefined || customerId === null) {
-    console.error('Error: No se puede eliminar un cliente sin ID.')
-    return
-  }
-
-  try {
-    const res = await httpService.delete(`customers/${customerId}`)
-    if (res.status === 200 && customerResponse.value) {
-      customerResponse.value = customerResponse.value.filter(
-        (customer) => customer.customer.id !== customerId,
-      )
-    }
-  } catch (error) {
-    console.error('Error deleting customer:', error)
-  }
-}
 </script>
 
 <style scoped>

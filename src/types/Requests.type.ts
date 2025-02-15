@@ -56,4 +56,5 @@ export type IssueDTO = {
 export type CompanyDTO = {
   name: string
   description: string
+  phone_number: string
 }

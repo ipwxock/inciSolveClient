@@ -1,21 +1,28 @@
 <script setup lang="ts">
 import router from '@/router/routes'
+import { ref } from 'vue'
 import { RouterView } from 'vue-router'
 import { HttpService } from '@/services/httpService'
 import { computed } from 'vue'
+import Error500 from '@/components/Errors/Error-500.vue'
 
 const routes = router.getRoutes()
 const httpService = new HttpService()
 const userRole = localStorage.getItem('role')
+const show500Error = ref(false)
 
 async function logout() {
   try {
     const response = await httpService.post('logout', {})
-    console.log(response)
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('role')
-    router.push('/login')
-  } catch (error: any) {
+    if (response.status == 200) {
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('role')
+      router.push('/login')
+    } else {
+      //Load error page
+      show500Error.value = true
+    }
+  } catch (error: unknown) {
     console.error('Error during logout:', error)
   }
 }
@@ -46,11 +53,7 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
             <router-link
               v-if="
                 !route.path.includes('login') &&
-                !(
-                  (userRole == 'Manager' || userRole == 'Employee') &&
-                  route.path.includes('companies')
-                ) &&
-                !(userRole == 'Customer' && route.path.includes('Customers')) &&
+                !(userRole == 'Cliente' && route.path.includes('Customers')) &&
                 !(userRole !== 'Admin' && route.path.includes('admin'))
               "
               :to="
@@ -58,7 +61,7 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
                   ? route.path.substring(0, route.path.lastIndexOf('/:id'))
                   : route.path
               "
-              class="nav-link cursor-pointer p-2 rounded"
+              class="nav-link cursor-pointer p-2 rounded py-sm-3"
               active-class="active-link"
             >
               {{ route.name }}
@@ -80,8 +83,11 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
       </div>
     </div>
   </nav>
-  <main class="container-fluid">
+  <main v-if="!show500Error" class="content">
     <RouterView />
+  </main>
+  <main v-else>
+    <Error500 />
   </main>
 </template>
 
@@ -90,7 +96,8 @@ main {
   display: flex;
   flex-direction: column;
   margin-top: 2rem;
-  width: 89vw;
+  width: 88vw;
+  overflow-y: scroll;
 }
 
 .active-link {
@@ -104,6 +111,8 @@ main {
     justify-content: start;
     width: 200px;
     font-size: 1.5rem;
+    max-height: 100vh;
+    overflow-y: hidden;
   }
 
   .nav-wrapper {

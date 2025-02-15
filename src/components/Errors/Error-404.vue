@@ -13,8 +13,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
 // Definimos los props que acepta el componente
 defineProps({
   entity: {
