@@ -2,20 +2,26 @@
 import router from '@/router/routes'
 import { RouterView } from 'vue-router'
 import { HttpService } from '@/services/httpService'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import Error500 from '@/components/Errors/Error-500.vue'
 
 const routes = router.getRoutes()
 const httpService = new HttpService()
 const userRole = localStorage.getItem('role')
+const show500Error = ref(false)
 
 async function logout() {
   try {
     const response = await httpService.post('logout', {})
-    console.log(response)
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('role')
-    router.push('/login')
-  } catch (error: any) {
+    if (response.status == 200) {
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('role')
+      router.push('/login')
+    } else {
+      //Load error page
+      show500Error.value = true
+    }
+  } catch (error: unknown) {
     console.error('Error during logout:', error)
   }
 }
@@ -40,17 +46,14 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse justify-content-lg-between" id="navbarNav">
-        <ul v-if="userRole !== 'Admin'" class="navbar-nav ms-auto">
+      <div class="collapse navbar-collapse w-100 justify-content-lg-between" id="navbarNav">
+        <ul v-if="userRole !== 'Admin'" class="navbar-nav w-100 ms-auto">
           <li class="nav-item" v-for="route in navbarRoutes" :key="route.path">
             <router-link
               v-if="
                 !route.path.includes('login') &&
-                !(
-                  (userRole == 'Manager' || userRole == 'Employee') &&
-                  route.path.includes('companies')
-                ) &&
-                !(userRole == 'Customer' && route.path.includes('Customers')) &&
+                !(userRole == 'Cliente' && route.path.includes('customer')) &&
+                !(userRole == 'Cliente' && route.path.includes('employee')) &&
                 !(userRole !== 'Admin' && route.path.includes('admin'))
               "
               :to="
@@ -58,7 +61,7 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
                   ? route.path.substring(0, route.path.lastIndexOf('/:id'))
                   : route.path
               "
-              class="nav-link cursor-pointer p-2 rounded"
+              class="nav-link cursor-pointer p-2 w-100 rounded py-sm-3"
               active-class="active-link"
             >
               {{ route.name }}
@@ -68,7 +71,7 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
         <ul v-else class="navbar-nav ms-auto">
           <li class="nav-item">
             <router-link
-              to="/admin"
+              to="/admin-panel"
               class="nav-link cursor-pointer p-2 rounded"
               active-class="active-link"
             >
@@ -80,8 +83,11 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
       </div>
     </div>
   </nav>
-  <main class="container-fluid">
+  <main v-if="!show500Error" class="content">
     <RouterView />
+  </main>
+  <main v-else>
+    <Error500 />
   </main>
 </template>
 
@@ -90,7 +96,8 @@ main {
   display: flex;
   flex-direction: column;
   margin-top: 2rem;
-  width: 89vw;
+  width: 100vw;
+  overflow-y: scroll;
 }
 
 .active-link {
@@ -104,6 +111,8 @@ main {
     justify-content: start;
     width: 200px;
     font-size: 1.5rem;
+    max-height: 100vh;
+    overflow-y: hidden;
   }
 
   .nav-wrapper {
@@ -111,9 +120,19 @@ main {
     flex-direction: column;
     justify-content: start;
     > a {
+      font-size: 2.3rem;
       padding: 2rem;
       color: #379bff;
     }
+  }
+
+  .nav-item {
+    display: flex;
+    font-size: 1.3rem;
+  }
+
+  main {
+    width: calc(100vw - 200px);
   }
 
   #navbarNav {
@@ -129,8 +148,7 @@ main {
     gap: 1rem;
   }
 
-  .router-link-active {
-    background-color: #7fbfff;
+  .active-link {
     font-weight: bold;
   }
 }

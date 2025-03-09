@@ -9,6 +9,17 @@ export type CustomerDTO = {
   role: 'Cliente'
 }
 
+export type UserDTO = {
+  dni: string
+  first_name: string
+  last_name: string
+  email: string
+  role: 'Cliente' | 'Empleado' | 'Manager' | ''
+  company_id?: number
+  address?: string
+  phone_number?: string
+}
+
 export type InsuranceDTO = {
   subject_type:
     | 'Vida'
@@ -24,6 +35,7 @@ export type InsuranceDTO = {
     | 'Viaje'
     | 'Mascotas'
     | 'Otros'
+    | ''
   description: string
   customer_id: number
   employee_id: number
@@ -49,11 +61,12 @@ export type ManagerDTO = {
 
 export type IssueDTO = {
   insurance_id: number
-  description: string
-  status: 'Abierta' | 'Pendiente' | 'Cerrada'
+  subject: string
+  status: 'Abierta' | 'Pendiente' | 'Cerrada' | ''
 }
 
 export type CompanyDTO = {
   name: string
   description: string
+  phone_number: string
 }

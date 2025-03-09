@@ -11,6 +11,9 @@
             <div class="col-10">
               <h1>Iniciar Sesión</h1>
               <img src="@/assets/logo_incisolve.jpg" id="incisolve-logo" alt="Logo" />
+              <div v-if="errorMessage.length > 0" class="alert alert-danger mt-3" role="alert">
+                {{ errorMessage }}
+              </div>
               <form @submit.prevent="handleLogin">
                 <div class="form-group g-3 text-start">
                   <label for="email">Email</label>
@@ -37,12 +40,24 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
 const router = useRouter()
+const queryParams = new URLSearchParams(window.location.search)
+const errorMessage = ref('')
+
+const handleError = () => {
+  if (queryParams.get('error') === '401') {
+    errorMessage.value = 'Su sesión ha caducado. Por favor, inicie sesión nuevamente.'
+  }
+}
+
+onMounted(() => {
+  handleError()
+})
 
 const handleLogin = async () => {
   try {
@@ -72,10 +87,11 @@ const handleLogin = async () => {
 
       router.push('/') // Redirige al dashboard o página protegida
     } else {
-      alert('Credenciales incorrectas')
+      errorMessage.value = data.message
     }
   } catch (error) {
     console.log(error)
+    errorMessage.value = 'No se pudo realizar el login. Inténtelo de nuevo más tarde.'
   }
 }
 </script>

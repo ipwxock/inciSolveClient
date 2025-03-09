@@ -13,17 +13,11 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
 // Definimos los props que acepta el componente
 defineProps({
   entity: {
-    type: String, // Tipo del prop
-    required: false, // Obligatorio
+    type: String,
+    required: false,
   },
 })
 </script>
-
-<style scoped>
-/* Estilos específicos de Error404Component */
-</style>

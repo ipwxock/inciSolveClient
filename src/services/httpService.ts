@@ -30,6 +30,13 @@ export class HttpService {
       const json = await response.json()
 
       if (!response.ok) {
+        // 🛑 Verifica si el error es "Unauthenticated."
+        if (response.status === 401 || json.message === 'Unauthenticated.') {
+          console.warn('Sesión expirada. Redirigiendo al login...')
+          localStorage.clear()
+          window.location.href = '/login?error=401' // 🔄 Redirige al login
+        }
+
         return {
           error: json.message || `Error ${response.status}: ${response.statusText}`,
           status: response.status,

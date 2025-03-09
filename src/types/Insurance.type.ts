@@ -9,7 +9,8 @@ export type Insurance = {
     | 'Asistencia_carretera'
     | 'Salud'
     | 'Hogar'
-    | 'Auto'
+    | 'Coche'
+    | 'Motocicleta'
     | 'Viaje'
     | 'Mascotas'
     | 'Otros'
@@ -19,3 +20,19 @@ export type Insurance = {
   created_at: Date
   updated_at: Date
 }
+
+export const InsuranceSubject = [
+  'Vida',
+  'Robo',
+  'Defunción',
+  'Accidente',
+  'Incendios',
+  'Asistencia_carretera',
+  'Salud',
+  'Hogar',
+  'Coche',
+  'Motocicleta',
+  'Viaje',
+  'Mascotas',
+  'Otros',
+]

@@ -5,6 +5,6 @@ export type User = {
   last_name: string
   email: string
   role: 'Admin' | 'Manager' | 'Empleado' | 'Cliente'
-  created_at?: Date
-  updated_at?: Date
+  created_at: Date
+  updated_at: Date
 }

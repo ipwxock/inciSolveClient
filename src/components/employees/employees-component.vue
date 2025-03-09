@@ -2,11 +2,11 @@
   <div class="container-fluid">
     <div class="row w-100 align-items-end">
       <div class="col-6 text-start">
-        <h1>Clientes<i class="fa-sharp fa-solid fa-user"></i></h1>
+        <h1>Empleados<i class="fa-sharp fa-solid fa-user"></i></h1>
       </div>
-      <div v-if="!router.currentRoute.value.path.includes('customers/new')" class="col-6 text-end">
-        <router-link to="/customers/new" class="btn btn-primary w-100">
-          + Nuevo Cliente
+      <div v-if="!router.currentRoute.value.path.includes('employees/new')" class="col-6 text-end">
+        <router-link to="/employees/new" class="btn btn-primary w-100">
+          + Nuevo Empleado
         </router-link>
       </div>
     </div>
