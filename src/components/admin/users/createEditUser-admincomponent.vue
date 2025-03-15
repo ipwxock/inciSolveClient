@@ -239,7 +239,7 @@ petición falla, se muestra un mensaje de error. */
       class="col-12 col-md-4 mb-3"
       v-if="userDto.role === 'Empleado' || userDto.role === 'Manager'"
     >
-      <label for="company" class="form-label">Empresa</label>
+      <label for="company" class="form-label">Aseguradora</label>
       <select
         class="form-select"
         id="company_id"

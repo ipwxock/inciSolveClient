@@ -92,7 +92,19 @@ empleado - Permite eliminar un empleado */
                   <tr v-for="issue in employeeDetail.issues" :key="issue.id">
                     <td>{{ formatDate(issue.created_at) }}</td>
                     <td>{{ issue.subject }}</td>
-                    <td>{{ issue.status }}</td>
+                    <td>
+                      <div class="status-cell">
+                        <div
+                          :class="{
+                            'open-issue-indicator': issue.status === 'Abierta',
+                            'pending-issue-indicator': issue.status === 'Pendiente',
+                            'closed-issue-indicator': issue.status === 'Cerrada',
+                          }"
+                        ></div>
+                        &nbsp;
+                        {{ issue.status }}
+                      </div>
+                    </td>
                     <td>
                       <a :href="'/issues/' + issue.id + '/see'" class="btn btn-primary me-1"
                         >Ver Detalle</a
@@ -125,8 +137,6 @@ const employeeId = router.currentRoute.value.params.id
 const unauthorizedUser = ref(false)
 const employeeDetail = ref<DetailEmployeeResponse | null>(null)
 const loadingEmployees = ref(true)
-const showDeleteResponse = ref(false)
-const deleteResponse = ref<unknown>('')
 const showDeleteResult = ref({
   show: false,
   success: false,
@@ -176,24 +186,46 @@ const fetchEmployee = async () => {
  */
 const deleteemployee = async () => {
   try {
-    const response = await httpService.delete(`employees/${employeeId}/delete`)
+    const response = await httpService.delete(`employees/${employeeId}`)
     if (response.status === 200) {
-      deleteResponse.value = 'Empleado eliminado correctamente'
+      showDeleteResult.value = {
+        show: true,
+        success: true,
+        message: 'Empleado eliminado correctamente',
+      }
     } else if (response.status === 403) {
-      deleteResponse.value = 'No tienes permisos para realizar esta acción'
+      showDeleteResult.value = {
+        show: true,
+        success: false,
+        message: 'No tienes permisos para realizar esta acción',
+      }
     } else if (response.status === 400) {
-      deleteResponse.value = 'No se puede eliminar el empleado porque tiene pólizas asociadas'
+      showDeleteResult.value = {
+        show: true,
+        success: false,
+        message: 'No se puede eliminar el empleado porque tiene pólizas asociadas',
+      }
     } else {
-      deleteResponse.value = 'Error al eliminar el empleado'
+      showDeleteResult.value = {
+        show: true,
+        success: false,
+        message: 'Error al eliminar el empleado',
+      }
     }
-    showDeleteResponse.value = true
   } catch (error) {
     console.error('Error deleting employee:', error)
-    showDeleteResponse.value = true
-    deleteResponse.value = 'No tienes permisos para realizar esta acción'
+    showDeleteResult.value = {
+      show: true,
+      success: false,
+      message: 'Error al eliminar el empleado',
+    }
   } finally {
     setTimeout(() => {
-      showDeleteResponse.value = false
+      showDeleteResult.value = {
+        show: false,
+        success: false,
+        message: '',
+      }
     }, 5000)
   }
 }

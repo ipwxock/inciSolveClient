@@ -170,6 +170,7 @@ const deleteInsurance = async () => {
       }
     }
   } catch (error) {
+    console.error('Error deleting insurance:', error)
     showDeleteResult.value = {
       show: true,
       success: false,
