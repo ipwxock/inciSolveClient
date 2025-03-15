@@ -226,9 +226,9 @@
     <!-- COMPANY ID -->
     <div
       class="col-12 col-md-4 mb-3"
-      v-if="userDto.role === 'Empleado' || userDto.role === 'Manager'"
+      v-if="userDto.role === 'Empleado' || (userDto.role === 'Manager' && userToEdit === undefined)"
     >
-      <label for="company" class="form-label">Empresa</label>
+      <label for="company" class="form-label">Aseguradora</label>
       <select
         class="form-select"
         v-model="userDto.company_id"
