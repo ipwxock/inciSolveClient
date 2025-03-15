@@ -237,7 +237,7 @@ petición falla, se muestra un mensaje de error. */
     <!-- COMPANY ID -->
     <div
       class="col-12 col-md-4 mb-3"
-      v-if="userDto.role === 'Empleado' || userDto.role === 'Manager'"
+      v-if="(userDto.role === 'Empleado' || userDto.role === 'Manager') && userToEdit === undefined"
     >
       <label for="company" class="form-label">Aseguradora</label>
       <select

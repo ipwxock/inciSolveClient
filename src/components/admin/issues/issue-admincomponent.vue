@@ -85,6 +85,9 @@ search bar para filtrar las incidencias */
           </tbody>
         </table>
       </div>
+      <div v-else class="col-12">
+        <p>No se encontraron incidencias.</p>
+      </div>
     </div>
   </div>
 </template>
