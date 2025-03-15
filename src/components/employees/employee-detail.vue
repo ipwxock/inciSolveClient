@@ -63,7 +63,7 @@
                     <td>{{ formatDate(insurance.created_at) }}</td>
                     <td>{{ insurance.description }}</td>
                     <td>
-                      <a :href="'/policies/' + insurance.id" class="btn btn-primary me-1"
+                      <a :href="'/insurances/' + insurance.id + '/see'" class="btn btn-primary me-1"
                         >Ver Detalle</a
                       >
                     </td>
