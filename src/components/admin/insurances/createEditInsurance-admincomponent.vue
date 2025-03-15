@@ -1,3 +1,7 @@
+/* Este componente es una versión Admin del formulario de creación y edición de pólizas de seguros.
+Se ha añadido el campo de selección de empleado, que no estaba presente en la versión de
+Manager/Empleado. El formulario permite crear o editar una póliza de seguro, seleccionando un
+cliente y un empleado, y especificando el tipo de póliza y una descripción. */
 <template>
   <div v-if="loadingData" class="container-fluid">
     <div class="row">
@@ -140,7 +144,7 @@
                 <option value="Salud">Salud</option>
                 <option value="Hogar">Hogar</option>
                 <option value="Coche">Coche</option>
-                <option value="Motocicleta">Motocicleta</option>
+                <option value="Moto">Moto</option>
                 <option value="Viaje">Viaje</option>
                 <option value="Mascotas">Mascotas</option>
                 <option value="Otros">Otros</option>
@@ -243,13 +247,20 @@ const customers = ref<CustomerResponse[]>([])
 const employees = ref<EmployeeResponse[]>([])
 
 onMounted(() => {
-  fetchCustomers()
-  fetchEmployees()
+  fetchAllCustomers()
+  fetchAllEmployees()
   if (insuranceId) {
     fetchInsurance()
   }
 })
 
+/**
+ * Obtiene la póliza de seguro con el ID especificado en la URL
+ *
+ * Usa el servicio `httpService` para obtener la Póliza de la API.
+ *
+ * @returns {void}
+ */
 const fetchInsurance = async () => {
   loadingData.value = true
   try {
@@ -267,7 +278,14 @@ const fetchInsurance = async () => {
   }
 }
 
-const fetchCustomers = async () => {
+/**
+ * Obtiene la lista de todos los clientes de InciSolve
+ *
+ * Usa el servicio `httpService` para obtener los clientes de la API.
+ *
+ * @returns {void}
+ */
+const fetchAllCustomers = async () => {
   try {
     const response = await httpService.get<CustomerResponse[]>('customers')
     if (response.status === 200) {
@@ -278,7 +296,14 @@ const fetchCustomers = async () => {
   }
 }
 
-const fetchEmployees = async () => {
+/**
+ * Obtiene la lista de todos los empleados de InciSolve
+ *
+ * Usa el servicio `httpService` para obtener los empleados de la API.
+ *
+ * @returns {void}
+ */
+const fetchAllEmployees = async () => {
   try {
     const response = await httpService.get<EmployeeResponse[]>('employees')
     if (response.status === 200) {
@@ -301,14 +326,23 @@ const validationErrors = ref({
   description: { touched: false, required: false, too_short: false, too_long: false },
 })
 
+/**
+ * Valida todos los campos del formulario.
+ * @returns {boolean} Indica si hay errores de validación.
+ */
 const validated = () => {
   return Object.values(validationErrors.value).some((field) =>
     Object.entries(field).some(([key, value]) => key !== 'touched' && value),
   )
 }
 
-// 🕵️‍♂️ Watchers individuales para cada campo
-
+/**
+ *  Valida el campo 'customer_id' (cliente de la póliza).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateCustomerId = () => {
   if (
     insuranceDto.value.customer_id &&
@@ -324,6 +358,13 @@ const validateCustomerId = () => {
   }
 }
 
+/**
+ * Valida el campo 'employee_id' (empleado de la póliza).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateEmployeeId = () => {
   if (
     insuranceDto.value.employee_id &&
@@ -339,6 +380,13 @@ const validateEmployeeId = () => {
   }
 }
 
+/**
+ * Valida el campo 'subject_type' (tipo de póliza).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateSubjectType = () => {
   if (
     insuranceDto.value.subject_type &&
@@ -355,6 +403,13 @@ const validateSubjectType = () => {
   }
 }
 
+/**
+ * Valida el campo 'description' (descripción de la póliza).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateDescription = () => {
   validationErrors.value.description.touched = true
   validationErrors.value.description.required = insuranceDto.value.description.trim() === ''
@@ -362,6 +417,10 @@ const validateDescription = () => {
   validationErrors.value.description.too_long = insuranceDto.value.description.length > 255
 }
 
+/**
+ * Función de envío del formulario. Dependiendo de la presencia de `companyId`, realiza una actualización o una creación.
+ * @returns {void}
+ */
 const handleSubmit = async () => {
   if (insuranceId) {
     await updateInsurance()
@@ -370,6 +429,17 @@ const handleSubmit = async () => {
   }
 }
 
+/**
+ * Crea una nueva póliza de seguro
+ *
+ * Usa el servicio `httpService` para enviar la Póliza a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const createInsurance = async () => {
   try {
     const response = await httpService.post('insurances', insuranceDto.value)
@@ -405,6 +475,17 @@ const createInsurance = async () => {
   }
 }
 
+/**
+ * Actualiza una póliza de seguro existente
+ *
+ * Usa el servicio `httpService` para enviar la Póliza a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const updateInsurance = async () => {
   try {
     const response = await httpService.put(`insurances/${insuranceId}`, insuranceDto.value)

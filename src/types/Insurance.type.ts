@@ -1,3 +1,7 @@
+/*
+  Este tipo representa a una póliza.
+  Se utiliza para definir el tipo de dato de las pólizas en la base de datos.
+*/
 export type Insurance = {
   id: number
   subject_type:
@@ -10,7 +14,7 @@ export type Insurance = {
     | 'Salud'
     | 'Hogar'
     | 'Coche'
-    | 'Motocicleta'
+    | 'Moto'
     | 'Viaje'
     | 'Mascotas'
     | 'Otros'
@@ -21,6 +25,9 @@ export type Insurance = {
   updated_at: Date
 }
 
+/*
+  Este tipo representa a el objeto de una póliza.
+*/
 export const InsuranceSubject = [
   'Vida',
   'Robo',
@@ -31,7 +38,7 @@ export const InsuranceSubject = [
   'Salud',
   'Hogar',
   'Coche',
-  'Motocicleta',
+  'Moto',
   'Viaje',
   'Mascotas',
   'Otros',

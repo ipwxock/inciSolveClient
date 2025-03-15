@@ -1,3 +1,6 @@
+/**
+ * Este tipo de dato representa un usuario de InciSolve.
+ */
 export type User = {
   id?: number
   dni: string

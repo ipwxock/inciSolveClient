@@ -1,3 +1,7 @@
+/** Componente CreateEditCompanyAdminComponent Este componente es el encargado de mostrar el
+formulario para crear o editar una aseguradora. Se encarga de validar los campos del formulario y de
+enviar la petición al servidor para crear o editar la aseguradora. En caso de que se esté editando
+una aseguradora, se obtienen los datos de la aseguradora a través de la API. */
 <template>
   <form class="container" @submit.prevent="handleSubmit">
     <div class="row">
@@ -139,6 +143,13 @@ onMounted(() => {
   }
 })
 
+/**
+ * Función que se encarga de obtener los datos de la empresa a través de la API.
+ *
+ * Usa el servicio `httpService` para obtener la empresa.
+ *
+ * @returns {void}
+ */
 const fetchCompany = async () => {
   try {
     const response = await httpService.get<Company>(`companies/${companyId}/get-company-simple`)
@@ -165,6 +176,13 @@ const fetchCompany = async () => {
   }
 }
 
+/**
+ * Valida el campo 'name' (nombre de la empresa).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateName = () => {
   validationErrors.value.name.touched = true
   validationErrors.value.name.required = companyDTO.value.name.length === 0
@@ -173,6 +191,13 @@ const validateName = () => {
   validationErrors.value.name.too_long = companyDTO.value.name.length > 255
 }
 
+/**
+ * Valida el campo 'description' (descripción de la empresa).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateDescription = () => {
   validationErrors.value.description.touched = true
   validationErrors.value.description.too_short =
@@ -180,20 +205,23 @@ const validateDescription = () => {
   validationErrors.value.description.too_long = companyDTO.value.description.length > 255
 }
 
-// Validate the above using validatePhoneNumber format
-
+/**
+ * Valida el campo 'phone_number' (teléfono de la empresa).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validatePhoneNumber = () => {
   validationErrors.value.phone_number.touched = true
   validationErrors.value.phone_number.pattern =
     !/^[0-9]{9}$/.test(companyDTO.value.phone_number) && companyDTO.value.phone_number.length > 0
 }
 
-// watchEffect(() => {
-//   validateName()
-//   validateDescription()
-//   validatePhoneNumber()
-// })
-
+/**
+ * Función de envío del formulario. Dependiendo de la presencia de `companyId`, realiza una actualización o una creación.
+ * @returns {void}
+ */
 const handleSubmit = () => {
   if (router.currentRoute.value.params.id) {
     updateCompany()
@@ -202,6 +230,17 @@ const handleSubmit = () => {
   }
 }
 
+/**
+ * Función que se encarga de actualizar una empresa en la base de datos.
+ *
+ * Usa el servicio `httpService` para enviar la Aseguradora a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response tiene éxito, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const updateCompany = async () => {
   try {
     const response = await httpService.put<Company>(
@@ -210,7 +249,7 @@ const updateCompany = async () => {
     )
 
     if (response.status === 200) {
-      showRequestResult.value.message = 'Empresa actualizada correctamente'
+      showRequestResult.value.message = 'Aseguradora actualizada correctamente'
       showRequestResult.value.success = true
       showRequestResult.value.show = true
       return
@@ -237,11 +276,22 @@ const updateCompany = async () => {
   }
 }
 
+/**
+ * Función que se encarga de crear una empresa en la base de datos.
+ *
+ * Usa el servicio `httpService` para enviar la Aseguradora a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response tiene éxito, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const createCompany = async () => {
   try {
     const response = await httpService.post<Company>('companies', companyDTO.value)
     if (response.status === 201) {
-      showRequestResult.value.message = 'Empresa creada correctamente'
+      showRequestResult.value.message = 'Aseguradora creada correctamente'
       showRequestResult.value.success = true
       showRequestResult.value.show = true
     } else if (response.status === 403) {

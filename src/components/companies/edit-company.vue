@@ -1,3 +1,9 @@
+/* Este componente es un formulario que permite editar una aseguradora. Se compone de los siguientes
+campos: - Nombre: campo de texto obligatorio con un mínimo de 3 caracteres y un máximo de 255. -
+Teléfono: campo de texto opcional que debe tener 9 dígitos. - Descripción: campo de texto opcional
+con un mínimo de 10 caracteres y un máximo de 255. - Botón de enviar: botón que envía el formulario
+y actualiza la aseguradora en la base de datos. - Mensaje de resultado: mensaje que indica si la
+operación ha sido exitosa o no. */
 <template>
   <form class="container" @submit.prevent="handleSubmit">
     <div class="row">
@@ -115,6 +121,13 @@ import type { CompanyDTO } from '@/types/Requests.type'
 import { HttpService } from '@/services/httpService'
 
 const httpService = new HttpService()
+
+/**
+ * Propiedades del componente.
+ * @property {Company} company - Objeto de tipo Company que contiene los datos de la aseguradora.
+ * @property {Company} default - Objeto de tipo Company con valores por defecto.
+ * @returns {Object} - Objeto con las propiedades del componente.
+ */
 const props = defineProps({
   company: Object as () => Company,
   default: () => ({
@@ -139,6 +152,13 @@ const validationErrors = ref({
   phone_number: { touched: false, pattern: false },
 })
 
+/**
+ * Valida el campo 'name' (nombre de la empresa).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error en el formulario.
+ *
+ * @returns {void}
+ */
 const validateName = () => {
   validationErrors.value.name.touched = true
   validationErrors.value.name.required = companyDTO.value.name.length === 0
@@ -147,6 +167,13 @@ const validateName = () => {
   validationErrors.value.name.too_long = companyDTO.value.name.length > 255
 }
 
+/**
+ * Valida el campo 'description' (descripción de la empresa).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error en el formulario.
+ *
+ * @returns {void}
+ */
 const validateDescription = () => {
   validationErrors.value.description.touched = true
   validationErrors.value.description.too_short =
@@ -154,20 +181,35 @@ const validateDescription = () => {
   validationErrors.value.description.too_long = companyDTO.value.description.length > 255
 }
 
-// Validate the above using validatePhoneNumber format
-
+/**
+ * Valida el campo 'phone_number' (teléfono de la empresa).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error en el formulario.
+ *
+ * @returns {void}
+ */
 const validatePhoneNumber = () => {
   validationErrors.value.phone_number.touched = true
   validationErrors.value.phone_number.pattern =
     !/^[0-9]{9}$/.test(companyDTO.value.phone_number) && companyDTO.value.phone_number.length > 0
 }
 
+/**
+ * Observa los cambios en los campos del formulario y valida los datos.
+ *
+ * @returns {void}
+ */
 watchEffect(() => {
   validateName()
   validateDescription()
   validatePhoneNumber()
 })
 
+/**
+ * Actualiza el objeto `companyDTO` con los datos de la aseguradora.
+ *
+ * @returns {void}
+ */
 watchEffect(() => {
   if (props.company) {
     companyDTO.value = {
@@ -178,14 +220,25 @@ watchEffect(() => {
   }
 })
 
+/**
+ * Función de envío del formulario. Dependiendo de la presencia de `companyId`, realiza una actualización o una creación.
+ * @returns {void}
+ */
 const handleSubmit = () => {
-  if (props.company) {
-    updateCompany()
-  } else {
-    createCompany()
-  }
+  updateCompany()
 }
 
+/**
+ * Actualiza la aseguradora en la base de datos
+ *
+ * Usa el servicio `httpService` para realizar una petición PUT a la API.
+ * Usa el objeto showRequestResult para mostrar un mensaje de éxito o error.
+ *
+ * Si la petición es exitosa, muestra un mensaje de éxito.
+ * Si la petición es denegada por falta de permisos, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const updateCompany = async () => {
   try {
     const response = await httpService.put<Company>(
@@ -194,7 +247,7 @@ const updateCompany = async () => {
     )
 
     if (response.status === 200) {
-      showRequestResult.value.message = 'Empresa actualizada correctamente'
+      showRequestResult.value.message = 'Aseguradora actualizada correctamente'
       showRequestResult.value.success = true
       showRequestResult.value.show = true
       return
@@ -207,45 +260,12 @@ const updateCompany = async () => {
       return
     } else {
       showRequestResult.value.message =
-        'Error al actualizar la empresa. Comprueba los datos introducidos.'
+        'Error al actualizar la Aseguradora. Comprueba los datos introducidos.'
       showRequestResult.value.success = false
       showRequestResult.value.show = true
     }
   } catch (error) {
     console.error('Error updating company:', error)
-    showRequestResult.value = {
-      show: true,
-      success: false,
-      message: 'Ocurrió un error inesperado. Inténtalo de nuevo más tarde.',
-    }
-  }
-}
-
-const createCompany = async () => {
-  try {
-    const response = await httpService.post<Company>('companies', companyDTO.value)
-    if (response.status === 201) {
-      showRequestResult.value.message = 'Empresa creada correctamente'
-      showRequestResult.value.success = true
-      showRequestResult.value.show = true
-    } else if (response.status === 403) {
-      showRequestResult.value = {
-        show: true,
-        success: false,
-        message: 'No estás autorizado a realizar esta acción.',
-      }
-      return
-    } else if (response.error) {
-      showRequestResult.value.message = 'Error al crear la empresa' + response.error
-      showRequestResult.value.success = false
-      showRequestResult.value.show = true
-    } else {
-      showRequestResult.value.message = 'Error al crear la empresa'
-      showRequestResult.value.success = false
-      showRequestResult.value.show = true
-    }
-  } catch (error) {
-    console.error('Error creating company:', error)
     showRequestResult.value = {
       show: true,
       success: false,

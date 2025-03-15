@@ -1,3 +1,7 @@
+/* Este componente es el encargado de mostrar todas las pólizas de Incisolve. Sólo un Admin puede
+acceder. Se encarga de mostrar una tabla con todas las pólizas, permitiendo filtrarlas por el objeto
+de la póliza, el nombre del empleado que la creó, el nombre del cliente al que pertenece y la fecha
+de creación de la póliza. */
 <template>
   <div class="container-fluid px-md-3">
     <div class="row justify-content-space-evenly align-items-center">
@@ -122,6 +126,13 @@ watch(searchString, (value) => {
   }
 })
 
+/**
+ * Recupera todas las pólizas de Incisolve.
+ *
+ * Usa el servicio HTTP para hacer una petición GET a la API de Incisolve y recuperar todas las pólizas
+ *
+ * @returns {void}
+ */
 const fetchInsurances = async () => {
   loadingInsurances.value = true
   try {
@@ -137,6 +148,11 @@ const fetchInsurances = async () => {
   }
 }
 
+/**
+ * Elimina una póliza de Incisolve.
+ * @param id ID de la póliza a eliminar.
+ * @returns {void}
+ */
 const deleteInsurance = async (id: number) => {
   try {
     const response = await httpService.delete(`insurances/${id}`)

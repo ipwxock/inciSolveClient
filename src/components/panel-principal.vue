@@ -1,3 +1,7 @@
+/* Este componente es la página principal de la aplicación, donde se muestra un mensaje de
+bienvenida al usuario y, en caso de que haya un error 403, se muestra un componente de error
+personalizado.*/
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import Unauthorized403 from '@/components/Errors/Unauthorized-403.vue'
@@ -12,6 +16,9 @@ const handleError = () => {
   }
 }
 
+/**
+ * Se ejecuta al montar el componente
+ */
 onMounted(() => {
   handleError()
 })
@@ -26,17 +33,16 @@ onMounted(() => {
       </h1>
     </div>
     <div class="row">
-      <p class="h3 text-center pt-5">
+      <div v-if="showError403" class="pt-5">
+        <Unauthorized403 />
+      </div>
+      <p v-else class="h3 text-center pt-5">
         Te damos la bienvenida a InciSolve.<br /><br />
         Aquí podrás encontrar información sobre tus diferentes pólizas de seguros, consultar
         información sobre las compañías aseguradoras, gestionar tus propias incidencias, y mucho
         más!
       </p>
     </div>
-  </div>
-
-  <div v-if="showError403" class="container-fluid">
-    <Unauthorized403 />
   </div>
 </template>
 

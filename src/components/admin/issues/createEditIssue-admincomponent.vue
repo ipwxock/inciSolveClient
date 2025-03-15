@@ -1,3 +1,7 @@
+/* Este componente es una vista que permite al usuario administrador crear o editar incidencias. Si
+el usuario está creando una nueva incidencia, se le mostrará un formulario con los campos necesarios
+para crear una nueva incidencia. Si el usuario está editando una incidencia existente, se le
+mostrará un formulario con los campos de la incidencia a editar. */
 <template>
   <div v-if="loadingIssue" class="container-fluid">
     <div class="row">
@@ -194,6 +198,14 @@ onMounted(() => {
   fetchInsurances()
 })
 
+/**
+ * Funcion que obtiene la información de la incidencia seleccionada
+ *
+ * Usa el servicio `httpService` para obtener la incidencia de la API.
+ *
+ * @param insuranceId Id de la incidencia seleccionada
+ * @returns {void}
+ */
 const fetchIssue = async () => {
   loadingIssue.value = true
   try {
@@ -220,6 +232,13 @@ const fetchIssue = async () => {
   }
 }
 
+/**
+ * Funcion que obtiene la información de las pólizas
+ *
+ * Usa el servicio `httpService` para obtener las pólizas de la API.
+ *
+ * @returns {void}
+ */
 const fetchInsurances = async () => {
   try {
     const response = await httpService.get<InsuranceResponse[]>('insurances')
@@ -231,6 +250,11 @@ const fetchInsurances = async () => {
   }
 }
 
+/**
+ * Función que obtiene la información de la póliza seleccionada para formatear la información en el select (UX)
+ *
+ * @param insuranceId Id de la póliza seleccionada
+ */
 const getInsuranceInfo = (insuranceId: number) => {
   const selectedInsurance = insurances.value.find((i) => i.insurance.id == insuranceId)
 
@@ -251,14 +275,23 @@ const validationErrors = ref({
   description: { touched: false, required: false, too_short: false, too_long: false },
 })
 
+/**
+ * Valida si hay errores en el formulario
+ * @returns {boolean}
+ */
 const validated = () => {
   return Object.values(validationErrors.value).some((field) =>
     Object.entries(field).some(([key, value]) => key !== 'touched' && value),
   )
 }
 
-// 🕵️‍♂️ Watchers individuales para cada campo
-
+/**
+ * Valida los campos del formulario
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateInsuranceId = () => {
   if (issue.value !== undefined && issue.value.insurance_id != issueDto.value.insurance_id) {
     validationErrors.value.insurance_id.untouchableError = true
@@ -271,6 +304,13 @@ const validateInsuranceId = () => {
   }
 }
 
+/**
+ * Valida el campo 'status' (estado de la incidencia).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateStatus = () => {
   if (issue.value === undefined && issueDto.value.status !== 'Abierta') {
     validationErrors.value.status.forceInitialState = true
@@ -283,6 +323,13 @@ const validateStatus = () => {
   }
 }
 
+/**
+ * Valida el campo 'description' (descripción de la incidencia).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateDescription = () => {
   validationErrors.value.description.touched = true
   validationErrors.value.description.required = issueDto.value.subject.trim() === ''
@@ -290,6 +337,10 @@ const validateDescription = () => {
   validationErrors.value.description.too_long = issueDto.value.subject.length > 255
 }
 
+/**
+ * Función de envío del formulario. Dependiendo de la presencia de `companyId`, realiza una actualización o una creación.
+ * @returns {void}
+ */
 const handleSubmit = async () => {
   if (issueId) {
     await updateIssue()
@@ -298,6 +349,17 @@ const handleSubmit = async () => {
   }
 }
 
+/**
+ * Funcion que crea una nueva incidencia
+ *
+ * Usa el servicio `httpService` para enviar la Incidencia a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const createIssue = async () => {
   try {
     const response = await httpService.post('issues', issueDto.value)
@@ -333,6 +395,17 @@ const createIssue = async () => {
   }
 }
 
+/**
+ * Funcion que actualiza una incidencia existente
+ *
+ * Usa el servicio `httpService` para enviar la Incidencia a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const updateIssue = async () => {
   try {
     const response = await httpService.put(`issues/${issueId}`, issueDto.value)

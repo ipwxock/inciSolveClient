@@ -1,3 +1,5 @@
+/* Componente para agregar una nueva póliza Renderiza el componente create-edit-insurance para crear
+o editar una póliza */
 <template>
   <div class="container">
     <div class="row">

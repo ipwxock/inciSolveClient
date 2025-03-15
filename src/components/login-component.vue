@@ -1,3 +1,8 @@
+/** Este componente es un formulario de inicio de sesión que se conecta a una API para autenticar a
+los usuarios. * Si la autenticación es exitosa, se guarda el token de autenticación en el
+almacenamiento local y se redirige al usuario a la página protegida. * Si la autenticación falla, se
+muestra un mensaje de error. */
+
 <template>
   <div class="container-fluid container-host m-0 p-0">
     <div
@@ -36,12 +41,14 @@
         </div>
       </div>
     </div>
+    <FooterComponent />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import FooterComponent from './footer-component.vue'
 
 const email = ref('')
 const password = ref('')
@@ -49,6 +56,10 @@ const router = useRouter()
 const queryParams = new URLSearchParams(window.location.search)
 const errorMessage = ref('')
 
+/**
+ * Maneja los errores de autenticación.
+ * Comprueba si hay un error en los parámetros de la URL y muestra un mensaje de error adecuado.
+ */
 const handleError = () => {
   if (queryParams.get('error') === '401') {
     errorMessage.value = 'Su sesión ha caducado. Por favor, inicie sesión nuevamente.'
@@ -59,9 +70,13 @@ onMounted(() => {
   handleError()
 })
 
+/**
+ * Maneja el inicio de sesión del usuario.
+ * Realiza una llamada a la API para autenticar al usuario.
+ */
 const handleLogin = async () => {
   try {
-    // Llamada a tu API para autenticar
+    // Llamada a la API para autenticar
     const response = await fetch(import.meta.env.VITE_API_URL + 'login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -1,3 +1,5 @@
+/* Componente para agregar una incidencia Renderiza el componente create-edit-issue que sirve para
+agregar o editar una incidencia */
 <template>
   <div class="container">
     <div class="row">

@@ -1,3 +1,5 @@
+/* Componente que muestra el detalle de una póliza de seguro. Permite eliminar la póliza y muestra
+las incidencias asociadas a la misma. */
 <template>
   <!-- Estado de carga -->
   <div v-if="loadingInsurance" class="pt-5 mt-5 text-center">
@@ -112,6 +114,13 @@ onMounted(() => {
   }
 })
 
+/**
+ * Recupera la información de la póliza
+ *
+ * Usa el servicio HttpService para hacer la petición a la API.
+ *
+ * @returns {void}
+ */
 const fetchInsurance = async () => {
   loadingInsurance.value = true
   try {
@@ -131,6 +140,10 @@ const fetchInsurance = async () => {
   }
 }
 
+/**
+ * Elimina la póliza
+ * @returns {void}
+ */
 const deleteInsurance = async () => {
   try {
     const response = await httpservice.delete(`insurances/${route.params.id}`)

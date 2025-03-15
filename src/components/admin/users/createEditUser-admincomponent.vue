@@ -1,3 +1,7 @@
+/* Este componente es un formulario que permite crear o editar un usuario. Se compone de varios
+campos que se validan en tiempo real. Al enviar el formulario, se envía una petición al servidor
+para crear o editar el usuario. Si la petición es exitosa, se muestra un mensaje de éxito. Si la
+petición falla, se muestra un mensaje de error. */
 <template>
   <form @submit.prevent="handleSubmit" class="row">
     <!-- DNI -->
@@ -5,6 +9,7 @@
       <label for="dni" class="form-label">DNI</label>
       <input
         v-model="userDto.dni"
+        id="dni"
         class="form-control"
         placeholder="Ej: 8765421A"
         @blur="validateDNI"
@@ -37,6 +42,7 @@
       <label for="first_name" class="form-label">Nombre</label>
       <input
         v-model="userDto.first_name"
+        id="first_name"
         class="form-control"
         placeholder="Ej: Juan José"
         @blur="validateFirstName"
@@ -70,6 +76,7 @@
       <label for="last_name" class="form-label">Apellido</label>
       <input
         v-model="userDto.last_name"
+        id="last_name"
         class="form-control"
         placeholder="Ej: López Gómez"
         @blur="validateLastName"
@@ -103,6 +110,7 @@
       <label for="email" class="form-label">Email</label>
       <input
         v-model="userDto.email"
+        id="email"
         type="email"
         class="form-control"
         placeholder="Ej: ejemplo@ejemplo.com"
@@ -139,6 +147,7 @@
       <select
         class="form-select"
         v-model="userDto.role"
+        id="role"
         @blur="validateRole"
         @change="checkRole"
         :disabled="userToEdit != null"
@@ -169,6 +178,7 @@
       <input
         v-model="userDto.address"
         class="form-control"
+        id="address"
         placeholder="Ej: Calle Falsa 132"
         @blur="validateAddress"
         :required="userDto.role === 'Cliente'"
@@ -202,6 +212,7 @@
       <input
         v-model="userDto.phone_number"
         class="form-control"
+        id="phone_number"
         placeholder="Ej: 678912345"
         @blur="validatePhoneNumber"
         :required="userDto.role === 'Cliente'"
@@ -231,6 +242,7 @@
       <label for="company" class="form-label">Empresa</label>
       <select
         class="form-select"
+        id="company_id"
         v-model="userDto.company_id"
         @blur="validateCompanyId"
         :required="userDto.role === 'Empleado' || userDto.role === 'Manager'"
@@ -305,6 +317,11 @@ watch(userToEdit, () => {
   }
 })
 
+/**
+ * Comprueba si se ha proporcionado un ID de usuario en la URL. Si es así, se obtienen los datos del usuario
+ * y se rellenan los campos del formulario con ellos.
+ * @returns boolean
+ */
 onMounted(async () => {
   if (userId) {
     try {
@@ -317,11 +334,19 @@ onMounted(async () => {
     }
   }
 
+  // Independientemente, se obtienen las empresas para rellenar el select
   if (userDto.value.role === 'Empleado' || userDto.value.role === 'Manager') {
     fetchCompanies()
   }
 })
 
+/**
+ * Obtiene todas las empresas de InciSolve
+ *
+ * Usa el servicio HttpService para hacer una petición GET a la API de InciSolve y recuperar todas las empresas
+ *
+ * @returns {boolean}
+ */
 const fetchCompanies = async () => {
   try {
     const response = await httpService.get<Company[]>('companies')
@@ -345,14 +370,23 @@ const validationErrors = ref({
   company_id: { touched: false, required: false, too_short: false, too_long: false },
 })
 
+/**
+ * Comprueba si todos los campos del formulario son válidos.
+ * @returns {boolean}
+ */
 const validated = () => {
   return Object.values(validationErrors.value).every((field) =>
     Object.entries(field).every(([key, value]) => key === 'touched' || !value),
   )
 }
 
-// 🕵️‍♂️ Watchers individuales para cada campo
-
+/**
+ * Valida el campo 'dni' (DNI del usuario).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateDNI = () => {
   validationErrors.value.dni.untouchableError = false
   validationErrors.value.dni.touched = true
@@ -360,6 +394,13 @@ const validateDNI = () => {
   validationErrors.value.dni.pattern = !/^[0-9]{8}[A-Za-z]{1}$/.test(userDto.value.dni)
 }
 
+/**
+ * Valida el campo 'first_name' (nombre del usuario).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateFirstName = () => {
   validationErrors.value.first_name.touched = true
   validationErrors.value.first_name.required = userDto.value.first_name.trim() === ''
@@ -367,6 +408,13 @@ const validateFirstName = () => {
   validationErrors.value.first_name.too_long = userDto.value.first_name.length > 50
 }
 
+/**
+ * Valida el campo 'last_name' (apellido del usuario).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateLastName = () => {
   validationErrors.value.last_name.touched = true
   validationErrors.value.last_name.required = userDto.value.last_name.trim() === ''
@@ -374,6 +422,13 @@ const validateLastName = () => {
   validationErrors.value.last_name.too_long = userDto.value.last_name.length > 50
 }
 
+/**
+ * Valida el campo 'role' (rol del usuario).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateRole = () => {
   validationErrors.value.role.required =
     userDto.value.role !== 'Empleado' &&
@@ -381,6 +436,13 @@ const validateRole = () => {
     userDto.value.role !== 'Cliente'
 }
 
+/**
+ * Valida el campo 'address' (dirección del usuario en caso de ser Cliente).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateAddress = () => {
   if (userDto.value.role !== 'Cliente') return
   validationErrors.value.address.touched = true
@@ -393,6 +455,13 @@ const validateAddress = () => {
     : false
 }
 
+/**
+ * Valida el campo 'email' (email del usuario).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateEmail = () => {
   validationErrors.value.email.untouchableError = false
   validationErrors.value.email.touched = true
@@ -402,6 +471,13 @@ const validateEmail = () => {
   )
 }
 
+/**
+ * Valida el campo 'phone_number' (teléfono del usuario en caso de ser Cliente).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validatePhoneNumber = () => {
   if (userDto.value.role !== 'Cliente') return
   validationErrors.value.phone_number.touched = true
@@ -411,20 +487,42 @@ const validatePhoneNumber = () => {
     : false
 }
 
+/**
+ * Valida el campo 'company_id' (ID de la empresa a la que pertenece el usuario en caso de ser Empleado/Manager).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateCompanyId = () => {
   if (userDto.value.role !== 'Empleado' && userDto.value.role !== 'Manager') return
   validationErrors.value.company_id.touched = true
   validationErrors.value.company_id.required = userDto.value.company_id === 0
 }
 
+/**
+ * Función de envío del formulario. Dependiendo de la presencia de `companyId`, realiza una actualización o una creación.
+ * @returns {void}
+ */
 const handleSubmit = async () => {
   if (userId) {
-    editUser()
+    updateUser()
   } else {
     createUser()
   }
 }
 
+/**
+ * Crea un usuario en la base de datos
+ *
+ * Usa el servicio `httpService` para enviar al Usuario a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const createUser = async () => {
   try {
     const response = await httpService.post('users', userDto.value)
@@ -457,7 +555,19 @@ const createUser = async () => {
   }
 }
 
-const editUser = async () => {
+/**
+ * Edita un usuario en la base de datos
+ *
+ * Usa el servicio `httpService` para enviar al Usuario a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ *
+ * @returns {void}
+ */
+const updateUser = async () => {
   try {
     const response = await httpService.put(`users/${userId}`, userDto.value)
     if (response.status === 200) {

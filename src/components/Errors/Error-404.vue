@@ -1,3 +1,4 @@
+/* Página de error 404 Muestra un mensaje de error 404 y un enlace para volver al inicio */
 <template>
   <div class="container">
     <h1 class="text-center">Error 404</h1>
@@ -13,7 +14,11 @@
 </template>
 
 <script setup lang="ts">
-// Definimos los props que acepta el componente
+/**
+ * Propiedad que indica el tipo de entidad que no se ha encontrado
+ * @type {string}
+ * @default ''
+ */
 defineProps({
   entity: {
     type: String,

@@ -1,3 +1,11 @@
+/*
+ En este archivo se tienen los diferentes tipos de datos que se utilizan en las peticiones HTTP.
+ Cada tipo de dato representa un objeto que se envía o recibe en una petición HTTP, con un formato lo suficientemente simple para ser serializado y deserializado.
+ */
+
+/**
+ * Este tipo de dato representa un cliente de la compañía de seguros.
+ */
 export type CustomerDTO = {
   id?: number
   dni: string
@@ -9,6 +17,9 @@ export type CustomerDTO = {
   role: 'Cliente'
 }
 
+/**
+ * Este tipo de dato representa un usuario de  InciSolve.
+ */
 export type UserDTO = {
   dni: string
   first_name: string
@@ -20,6 +31,9 @@ export type UserDTO = {
   phone_number?: string
 }
 
+/**
+ * Este tipo de dato representa una póliza de seguro.
+ */
 export type InsuranceDTO = {
   subject_type:
     | 'Vida'
@@ -31,7 +45,7 @@ export type InsuranceDTO = {
     | 'Salud'
     | 'Hogar'
     | 'Coche'
-    | 'Motocicleta'
+    | 'Moto'
     | 'Viaje'
     | 'Mascotas'
     | 'Otros'
@@ -41,6 +55,9 @@ export type InsuranceDTO = {
   employee_id: number
 }
 
+/**
+ * Este tipo de dato representa un empleado de la compañía de seguros.
+ */
 export type EmployeeDTO = {
   dni: string
   first_name: string
@@ -50,6 +67,9 @@ export type EmployeeDTO = {
   role: 'Empleado'
 }
 
+/**
+ * Este tipo de dato representa un gerente de una compañía de seguros.
+ */
 export type ManagerDTO = {
   dni: string
   first_name: string
@@ -59,12 +79,18 @@ export type ManagerDTO = {
   role: 'Manager'
 }
 
+/**
+ * Este tipo de dato representa una incidencia relativa a una póliza de seguro.
+ */
 export type IssueDTO = {
   insurance_id: number
   subject: string
   status: 'Abierta' | 'Pendiente' | 'Cerrada' | ''
 }
 
+/**
+ * Este tipo de dato representa una compañía de seguros.
+ */
 export type CompanyDTO = {
   name: string
   description: string

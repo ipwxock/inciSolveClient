@@ -1,3 +1,8 @@
+/* Componente que contiene la vista de las pólizas, en el cual se muestra un título y un botón para
+agregar una nueva póliza, además de mostrar el componente hijo que contiene la tabla con las
+pólizas. Se importa el router para poder redirigir a la vista de creación de pólizas y se obtiene el
+rol del usuario para mostrar el botón de agregar póliza solo si el usuario no es un cliente. */
+
 <template>
   <div class="container-fluid">
     <div class="row w-100 align-items-end">

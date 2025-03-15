@@ -1,16 +1,20 @@
+/* Componente que contiene el footer de la página web. */
 <template>
-  <footer class="container footer">
+  <footer class="container-fluid footer">
     <div class="row">
-      <div class="col-12 col-md-4 text-start">
+      <div class="col-12 col-md-4">
         <p><strong>Desarrollado por el equipo de InciSolve</strong></p>
+        <p><strong>Autor:</strong> Felipe J. Gaitán</p>
       </div>
-      <div class="col-12 col-md-4 text-start">
+      <div class="col-12 col-md-4">
         <p>
           <strong>Contáctanos en: <a href="mailto:"></a></strong>
         </p>
+        <p>info@incisolve.com</p>
       </div>
-      <div class="col-12 col-md-4 text-start">
+      <div class="col-12 col-md-4">
         <p><strong>InciSolve© 2025</strong></p>
+        <p>Todos los derechos reservados.</p>
       </div>
     </div>
   </footer>
@@ -18,12 +22,11 @@
 
 <style scoped>
 .footer {
-  background-color: #0d6dfd04;
+  background-color: #f8f9fa;
   color: black;
   text-align: center;
-  padding: 1rem;
+  padding-top: 20px;
   width: 100%;
-  position: fixed;
   bottom: 0;
 }
 </style>

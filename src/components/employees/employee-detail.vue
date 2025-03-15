@@ -1,3 +1,6 @@
+/* Componente que muestra el detalle de un empleado en la plataforma - Muestra los datos del
+empleado - Muestra las pólizas emitidas por el empleado - Muestra las incidencias gestionadas por el
+empleado - Permite eliminar un empleado */
 <template>
   <div class="container pt-4">
     <!-- Estado de carga -->
@@ -63,7 +66,7 @@
                     <td>{{ formatDate(insurance.created_at) }}</td>
                     <td>{{ insurance.description }}</td>
                     <td>
-                      <a :href="'/policies/' + insurance.id" class="btn btn-primary me-1"
+                      <a :href="'/insurances/' + insurance.id + '/see'" class="btn btn-primary me-1"
                         >Ver Detalle</a
                       >
                     </td>
@@ -141,6 +144,13 @@ onMounted(() => {
   username.value = localStorage.getItem('username') ?? ''
 })
 
+/**
+ * Obtiene los datos de un empleado en la plataforma
+ *
+ * Usa el servicio HttpService para obtener los datos de un empleado usando su ID
+ *
+ * @returns {void}
+ */
 const fetchEmployee = async () => {
   try {
     const response = await httpService.get<DetailEmployeeResponse>(
@@ -160,7 +170,10 @@ const fetchEmployee = async () => {
   }
 }
 
-// Acción para eliminar un cliente
+/**
+ * Elimina un empleado de la plataforma
+ * @returns {void}
+ */
 const deleteemployee = async () => {
   try {
     const response = await httpService.delete(`employees/${employeeId}/delete`)

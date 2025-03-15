@@ -1,37 +1,7 @@
-<script lang="ts" setup>
-import { HttpService } from '@/services/httpService'
-import type { IssueResponse } from '@/types/Responses.type'
-import { onMounted, ref } from 'vue'
-import Unauthorized403 from '../Errors/Unauthorized-403.vue'
-import { formatDate } from '@/utils/date'
-
-const httpService = new HttpService()
-const issues = ref<IssueResponse[] | null>(null)
-const unauthorizedUser = ref(false)
-const loadingissues = ref(false)
-
-onMounted(async () => {
-  try {
-    await fetchIssues()
-  } catch (error) {
-    console.error('Error fetching issues:', error)
-  }
-})
-
-const fetchIssues = async () => {
-  loadingissues.value = true
-  try {
-    const response = await httpService.get<IssueResponse[]>('get-my-issues')
-    if (response.status === 200) {
-      issues.value = response.data ?? null
-    }
-  } catch (error) {
-    console.error('Error fetching issues:', error)
-  } finally {
-    loadingissues.value = false
-  }
-}
-</script>
+/* Este componente se utiliza para mostrar todas las incidencias que el usuario ha registrado en el
+sistema. Las incidencias se muestran en una tabla con las siguientes columnas: - Objeto de la póliza
+- Fecha de creación -Estado -Descripción -Última actualización -Acciones El usuario puede hacer clic
+en el botón "Ver" para ver los detalles de la incidencia. */
 
 <template>
   <div v-if="loadingissues" class="pt-5 mt-5 text-center">
@@ -46,6 +16,15 @@ const fetchIssues = async () => {
     <div class="container-fluid" v-else>
       <h2 class="ps-3">Mis Incidencias</h2>
       <section class="table-responsive">
+        <p v-if="userRole === 'Cliente'">
+          En esta sección podrás visualizar todas las incidencias que tienes registradas en el
+          sistema. Esto es, todas las incidencias que has reportado a la aseguradora y que están
+          pendientes de resolución.
+        </p>
+        <p v-if="userRole === 'Manager' || userRole == 'Empleado'">
+          En esta sección podrás visualizar todas las incidencias que tienes registradas en el
+          sistema. Esto es, todas las incidencias que han sido reportadas por tus clientes.
+        </p>
         <table class="table table-striped" v-if="issues !== null">
           <thead>
             <tr>
@@ -89,3 +68,45 @@ const fetchIssues = async () => {
     </div>
   </div>
 </template>
+<script lang="ts" setup>
+import { HttpService } from '@/services/httpService'
+import type { IssueResponse } from '@/types/Responses.type'
+import { onMounted, ref } from 'vue'
+import Unauthorized403 from '../Errors/Unauthorized-403.vue'
+import { formatDate } from '@/utils/date'
+
+const httpService = new HttpService()
+const issues = ref<IssueResponse[] | null>(null)
+const unauthorizedUser = ref(false)
+const loadingissues = ref(false)
+const userRole = localStorage.getItem('role')
+
+onMounted(async () => {
+  try {
+    await fetchIssues()
+  } catch (error) {
+    console.error('Error fetching issues:', error)
+  }
+})
+
+/**
+ * Recupera todas las incidencias del usuario.
+ *
+ * Usa el servicio HTTP para hacer una petición GET al servidor y recuperar todas las incidencias
+ *
+ * @returns {void}
+ */
+const fetchIssues = async () => {
+  loadingissues.value = true
+  try {
+    const response = await httpService.get<IssueResponse[]>('get-my-issues')
+    if (response.status === 200) {
+      issues.value = response.data ?? null
+    }
+  } catch (error) {
+    console.error('Error fetching issues:', error)
+  } finally {
+    loadingissues.value = false
+  }
+}
+</script>

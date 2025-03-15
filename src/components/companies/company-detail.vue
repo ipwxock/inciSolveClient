@@ -1,3 +1,9 @@
+/* Este componente se encarga de mostrar el detalle de una empresa, mostrando la información de la
+empresa, sus empleados, pólizas e incidencias. Para ello, se realiza una llamada a la API para
+obtener la información de la empresa y sus relaciones. En caso de que el usuario no tenga permisos
+para acceder a la información de la empresa, se mostrará un mensaje de error 403. En caso de que la
+empresa no exista, se mostrará un mensaje de error 404. En caso de que haya un error al obtener la
+información de la empresa, se mostrará un mensaje de error genérico. */
 <template>
   <div class="container">
     <div v-if="loadingCompany" class="pt-5 mt-5 text-center">
@@ -21,7 +27,7 @@
           <div class="row">
             <div class="col-12">
               <h4 class="pb-5">Modifica tu Aseguradora</h4>
-              <CreateEditCompany :company="companyResponse.company" />
+              <EditCompany :company="companyResponse.company" />
             </div>
           </div>
           <div class="row py-5 m-0 p-0">
@@ -119,7 +125,19 @@
                     <tr v-for="issue in companyResponse.issues" :key="issue.id">
                       <td>{{ formatDate(issue.created_at) }}</td>
                       <td>{{ issue.subject }}</td>
-                      <td>{{ issue.status }}</td>
+                      <td>
+                        <div class="status-cell">
+                          <div
+                            :class="{
+                              'open-issue-indicator': issue.status === 'Abierta',
+                              'pending-issue-indicator': issue.status === 'Pendiente',
+                              'closed-issue-indicator': issue.status === 'Cerrada',
+                            }"
+                          ></div>
+                          &nbsp;
+                          {{ issue.status }}
+                        </div>
+                      </td>
                       <td>
                         <a :href="'/issues/' + issue.id" class="btn btn-primary">Ver Detalle</a>
                       </td>
@@ -141,7 +159,7 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Unauthorized403 from '../Errors/Unauthorized-403.vue'
 import Error404 from '../Errors/Error-404.vue'
-import CreateEditCompany from './create-edit-company.vue'
+import EditCompany from './edit-company.vue'
 import type { DetailCompanyResponse } from '@/types/Responses.type'
 import { formatDate } from '@/utils/date'
 
@@ -156,6 +174,14 @@ onMounted(() => {
   fetchCompany()
 })
 
+/**
+ * Realiza la llamada a la API para obtener la información de la empresa
+ * y sus relaciones.
+ *
+ * Usa el servicio HttpService para hacer la petición a la API.
+ *
+ * @returns {void}
+ */
 const fetchCompany = async () => {
   try {
     // Realizamos la llamada HTTP y validamos la respuesta

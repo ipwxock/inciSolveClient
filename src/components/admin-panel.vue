@@ -1,3 +1,6 @@
+/* Este componente es el panel de administración de la aplicación. Desde aquí, un administrador
+puede gestionar las diferentes entidades de la aplicación. */
+
 <template>
   <div class="container-fluid pt-1">
     <div class="row pb-5">

@@ -1,3 +1,7 @@
+/* Este componente es el contenedor principal de la vista de aseguradoras. Se encarga de mostrar el
+título de la vista y de redirigir al usuario a la vista de su aseguradora si es un manager. Además,
+se encarga de cargar el id de la aseguradora del usuario en caso de que sea manager. En caso de que
+el usuario no sea manager, no se mostrará el botón de redirección. */
 <template>
   <div class="container-fluid">
     <div class="row w-100 align-items-end">
@@ -37,6 +41,14 @@ onMounted(() => {
   }
 })
 
+/**
+ * Función que se encarga de obtener el id de la aseguradora del usuario en caso de que sea manager.
+ * En caso de que no sea manager, se establece el valor de companyId a null.
+ *
+ * Usa el servicio HttpService para obtener el id de la aseguradora del usuario y lo guarda en la variable companyId.
+ *
+ * @returns {void}
+ */
 const fetchCompanyId = async () => {
   try {
     const response = await httpService.get<number>('get-my-company-id')

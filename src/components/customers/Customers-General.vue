@@ -1,3 +1,7 @@
+/* Este componente se encarga de mostrar todos los clientes que tiene el usuario logueado. Se
+obtienen los clientes a través de una llamada HTTP al backend. Si no hay clientes, se muestra un
+mensaje indicando que no se encontraron clientes. Si hay clientes, se muestra una tabla con los
+datos de los clientes y un botón para ver el detalle de cada cliente. */
 <template>
   <div v-if="loadingCustomers" class="pt-5 mt-5 text-center">
     <div class="spinner-border text-primary pt-5 mt-5" role="status">
@@ -5,6 +9,10 @@
     </div>
   </div>
   <div v-else>
+    <p class="ps-3">
+      En esta sección podrás visualizar todos los clientes que tienes registrados en el sistema.
+      Esto es, todos los clientes a los que les has vendido algún seguro y tienen su póliza creada.
+    </p>
     <section>
       <div v-if="customerResponse && customerResponse.length > 0" class="table-responsive">
         <table class="table table-striped">
@@ -23,7 +31,7 @@
               <td>{{ customerData.user.dni }}</td>
               <td>{{ customerData.user.first_name }}</td>
               <td>{{ customerData.user.last_name }}</td>
-              <td>{{ customerData.user.email }}</td>
+              <td class="customer-email">{{ customerData.user.email }}</td>
               <td>{{ customerData.customer.phone_number }}</td>
               <td>
                 <a :href="'/customers/' + customerData.customer.id" class="btn btn-primary me-1"
@@ -48,7 +56,15 @@ const httpService = new HttpService()
 const customerResponse = ref<CustomerResponse[] | null>(null)
 const loadingCustomers = ref(true)
 
-const fetchCustomers = async () => {
+/**
+ * Obtiene todos los clientes del usuario logueado.
+ *
+ * Usa el servicio httpService para obtener los clientes a través de una llamada HTTP al backend.
+ *
+ * Si no hay clientes, se muestra un mensaje indicando que no se encontraron clientes.
+ * Si hay clientes, se muestra una tabla con los datos de los clientes y un botón para ver el detalle de cada cliente.
+ */
+const fetchMyCustomers = async () => {
   // Si no existe, se obtienen todos los clientes
   try {
     // Realizamos la llamada HTTP y validamos la respuesta
@@ -61,8 +77,10 @@ const fetchCustomers = async () => {
     loadingCustomers.value = false
   }
 }
-
-onMounted(fetchCustomers)
+/**
+ * Se ejecuta al montar el componente y obtiene los clientes del usuario logueado.
+ */
+onMounted(fetchMyCustomers)
 </script>
 
 <style scoped>

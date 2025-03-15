@@ -1,34 +1,7 @@
-<script setup lang="ts">
-import router from '@/router/routes'
-import { RouterView } from 'vue-router'
-import { HttpService } from '@/services/httpService'
-import { computed, ref } from 'vue'
-import Error500 from '@/components/Errors/Error-500.vue'
-
-const routes = router.getRoutes()
-const httpService = new HttpService()
-const userRole = localStorage.getItem('role')
-const show500Error = ref(false)
-
-async function logout() {
-  try {
-    const response = await httpService.post('logout', {})
-    if (response.status == 200) {
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('role')
-      router.push('/login')
-    } else {
-      //Load error page
-      show500Error.value = true
-    }
-  } catch (error: unknown) {
-    console.error('Error during logout:', error)
-  }
-}
-
-// Filtrar rutas que deben aparecer en el navbar
-const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInNavBar))
-</script>
+/* Componente que contiene el navbar de la aplicación, el cual se compone de un menú de navegación y
+un botón de logout. El menú de navegación se compone de las rutas que se encuentran en el archivo
+routes.ts, las cuales se filtran dependiendo del rol del usuario. El botón de logout se encarga de
+cerrar la sesión del usuario y redirigirlo a la página de login. */
 
 <template>
   <!--Create a navBar with bootstrap-->
@@ -48,19 +21,19 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
       </button>
       <div class="collapse navbar-collapse w-100 justify-content-lg-between" id="navbarNav">
         <ul v-if="userRole !== 'Admin'" class="navbar-nav w-100 ms-auto">
-          <li class="nav-item" v-for="route in navbarRoutes" :key="route.path">
+          <li
+            class="nav-item"
+            v-for="route in navbarRoutes"
+            :key="route.path"
+            :class="{
+              'd-none': !(
+                route.meta.showInNavBar && (route.meta.roles as string[]).includes(userRole!)
+              ),
+            }"
+          >
             <router-link
-              v-if="
-                !route.path.includes('login') &&
-                !(userRole == 'Cliente' && route.path.includes('customer')) &&
-                !(userRole == 'Cliente' && route.path.includes('employee')) &&
-                !(userRole !== 'Admin' && route.path.includes('admin'))
-              "
-              :to="
-                route.path.includes(':id')
-                  ? route.path.substring(0, route.path.lastIndexOf('/:id'))
-                  : route.path
-              "
+              v-if="route.meta.showInNavBar && (route.meta.roles as string[]).includes(userRole!)"
+              :to="route.path"
               class="nav-link cursor-pointer p-2 w-100 rounded py-sm-3"
               active-class="active-link"
             >
@@ -79,7 +52,9 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
             </router-link>
           </li>
         </ul>
-        <a class="btn btn-primary mt-3 mt-lg-0 px-4 px-lg-5" @click="logout">Salir</a>
+        <a class="btn btn-primary mt-3 mt-lg-0 px-4 px-lg-5" id="logout-btn" @click="logout"
+          >Salir</a
+        >
       </div>
     </div>
   </nav>
@@ -90,6 +65,41 @@ const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInN
     <Error500 />
   </main>
 </template>
+
+<script setup lang="ts">
+import router from '@/router/routes'
+import { RouterView } from 'vue-router'
+import { HttpService } from '@/services/httpService'
+import { computed, ref } from 'vue'
+import Error500 from '@/components/Errors/Error-500.vue'
+
+const routes = router.getRoutes()
+const httpService = new HttpService()
+const userRole = localStorage.getItem('role')
+const show500Error = ref(false)
+
+/**
+ * Función que se encarga de cerrar la sesión del usuario y redirigirlo a la página de login.
+ */
+async function logout() {
+  try {
+    const response = await httpService.post('logout', {})
+    if (response.status == 200) {
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('role')
+      router.push('/login')
+    } else {
+      //Load error page
+      show500Error.value = true
+    }
+  } catch (error: unknown) {
+    console.error('Error during logout:', error)
+  }
+}
+
+// Filtrar rutas que deben aparecer en el navbar
+const navbarRoutes = computed(() => routes.filter((route) => route.meta?.showInNavBar))
+</script>
 
 <style scoped>
 main {

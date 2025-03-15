@@ -1,3 +1,7 @@
+/* Este componente muestra una lista de usuarios y permite filtrarlos por nombre, apellidos, email,
+rol y DNI. También permite eliminar usuarios no administradores. Incluye un botón para añadir un
+nuevo usuario y un mensaje de éxito o error al eliminar un usuario. También incluye un search bar
+para filtrar los usuarios. */
 <template>
   <div class="container-fluid px-md-3">
     <div class="row justify-content-space-evenly align-items-center">
@@ -6,7 +10,7 @@
       </h1>
       <div class="col-12 col-md-4">
         <router-link :to="route.path + '/new'">
-          <a class="btn btn-primary px-5">+ Añadir usuario</a>
+          <a class="btn btn-primary px-5">+ Añadir Usuario</a>
         </router-link>
       </div>
     </div>
@@ -121,6 +125,13 @@ watch(searchString, (newVal) => {
   }
 })
 
+/**
+ * Obtiene todos los usuarios del sistema.
+ *
+ * Usa el servicio HttpService para obtener los usuarios del sistema y los guarda en la variable users.
+ *
+ * @returns {void}
+ */
 const fetchUsers = async () => {
   try {
     const response = await httpService.get<User[]>('users')
@@ -135,6 +146,11 @@ const fetchUsers = async () => {
   }
 }
 
+/**
+ * Elimina un usuario del sistema.
+ * @param id ID del usuario a eliminar.
+ * @returns {void}
+ */
 const deleteUser = async (id: number) => {
   try {
     const response = await httpService.delete(`users/${id}`)

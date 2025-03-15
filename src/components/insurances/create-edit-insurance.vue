@@ -1,3 +1,10 @@
+/* Este componente es un formulario para crear o editar una póliza de seguro. Se compone de varios
+campos de entrada y un botón de envío. Al enviar el formulario, se realiza una petición HTTP al
+servidor para crear o actualizar la póliza. El formulario incluye validación de campos y muestra
+mensajes de error si los datos no son válidos. También muestra un mensaje de éxito o error después
+de enviar el formulario. El formulario se puede utilizar para crear una nueva póliza o editar una
+existente. */
+
 <template>
   <form @submit.prevent="handleSubmit" class="row">
     <div v-if="props.insurance.customer.user != undefined" class="col-9 col-md-6 mb-3">
@@ -41,8 +48,10 @@
         </span>
       </div>
     </div>
-
-    <div v-else class="col-9 col-md-6 mb-3">
+    <!------------------------------>
+    <!--  SI NO SE PASAN PROPS  -->
+    <!------------------------------>
+    <div v-else class="col-12 col-md-6 mb-3">
       <div class="form-group">
         <label for="customer" class="form-label mx-0 px-0"><strong>Cliente</strong></label
         ><br />
@@ -51,6 +60,7 @@
           v-model="insuranceDto.customer_id"
           class="form-select"
           placeholder="Seleccione un cliente"
+          id="customer_id"
           :class="{
             'is-invalid':
               validationErrors.customer_id.required && validationErrors.customer_id.touched,
@@ -79,6 +89,7 @@
         <select
           v-model="insuranceDto.subject_type"
           class="form-select"
+          id="subject_type"
           :class="{
             'is-invalid':
               validationErrors.subject_type.required && validationErrors.subject_type.touched,
@@ -98,7 +109,7 @@
           <option value="Salud">Salud</option>
           <option value="Hogar">Hogar</option>
           <option value="Coche">Coche</option>
-          <option value="Motocicleta">Motocicleta</option>
+          <option value="Moto">Moto</option>
           <option value="Viaje">Viaje</option>
           <option value="Mascotas">Mascotas</option>
           <option value="Otros">Otros</option>
@@ -108,7 +119,7 @@
         </span>
       </div>
     </div>
-    <div v-if="showCustomerCard && userRole !== 'Cliente'" class="col-3 col-md-6 pt-4 mb-3">
+    <div v-if="showCustomerCard && userRole !== 'Cliente'" class="col-12 col-md-6 pt-4 mb-3">
       <!--Create a card with customer data-->
       <div class="card justify-content-center">
         <div class="card-body text-center justify-content-center align-items-center">
@@ -134,6 +145,7 @@
         <textarea
           v-model="insuranceDto.description"
           class="form-control"
+          id="description"
           :disabled="userRole === 'Cliente'"
           rows="3"
           placeholder="Redacción del contrato de póliza. Detalles, coberturas, términos y condiciones, etc."
@@ -164,6 +176,14 @@
       </div>
     </div>
   </form>
+  <div
+    role="alert"
+    v-if="showRequestResult.show"
+    class="alert mt-3"
+    :class="showRequestResult.success ? 'alert-success' : 'alert-danger'"
+  >
+    {{ showRequestResult.message }}
+  </div>
   <div class="row px-4 pt-2">
     <button
       v-if="userRole !== 'Cliente'"
@@ -174,13 +194,6 @@
     >
       {{ props.insurance.insurance.id > 0 ? 'Actualizar' : 'Crear' + ' Póliza' }}
     </button>
-    <div
-      v-if="showRequestResult.show"
-      class="alert mt-3"
-      :class="showRequestResult.success ? 'alert-success' : 'alert-danger'"
-    >
-      {{ showRequestResult.message }}
-    </div>
   </div>
 </template>
 
@@ -205,7 +218,7 @@ const selectedCustomer = ref<CustomerResponse>()
 const search = ref('')
 
 onMounted(async () => {
-  fetchCustomers()
+  fetchAllCustomers()
 })
 
 const filteredCustomers = computed(() => {
@@ -217,13 +230,23 @@ const filteredCustomers = computed(() => {
   )
 })
 
+/**
+ * Muestra la tarjeta de cliente seleccionado
+ */
 const showCustomer = () => {
   selectedCustomer.value = customers.value.find(
     (c) => c.customer.id === insuranceDto.value.customer_id,
   )
   showCustomerCard.value = true
 }
-const fetchCustomers = async () => {
+/**
+ * Obtiene la lista de clientes
+ *
+ * Usa el servicio `httpService` para obtener la lista de clientes.
+ *
+ * @returns {void}
+ */
+const fetchAllCustomers = async () => {
   if (userRole === 'Cliente') return
   try {
     const response = await httpService.get<CustomerResponse[]>('customers')
@@ -234,6 +257,12 @@ const fetchCustomers = async () => {
   }
 }
 
+/**
+ * Propiedades del componente
+ *
+ * @property {DetailInsuranceResponse} insurance - Objeto de tipo DetailInsuranceResponse que contiene los datos de la póliza de seguro.
+ * @returns {Object} - Objeto con las propiedades del componente.
+ */
 const props = defineProps({
   insurance: {
     type: Object as () => DetailInsuranceResponse,
@@ -263,6 +292,9 @@ const props = defineProps({
   },
 })
 
+/**
+ * DTO de la póliza de seguro
+ */
 const insuranceDto = ref<InsuranceDTO>({
   subject_type: 'Otros',
   description: '',
@@ -294,14 +326,23 @@ const validationErrors = ref({
   description: { touched: false, required: false, too_short: false, too_long: false },
 })
 
+/**
+ * Validar campos del formulario
+ * @returns {boolean} Indica si hay errores de validación
+ */
 const validated = () => {
   return Object.values(validationErrors.value).some((field) =>
     Object.entries(field).some(([key, value]) => key !== 'touched' && value),
   )
 }
 
-// 🕵️‍♂️ Watchers individuales para cada campo
-
+/**
+ * Valida el campo 'customer_id' (cliente de la póliza).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateCustomerId = () => {
   if (
     props.insurance.customer.customer?.id &&
@@ -323,6 +364,13 @@ const validateCustomerId = () => {
   }
 }
 
+/**
+ * Valida el campo 'subject_type' (tipo de póliza).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateSubjectType = () => {
   if (
     props.insurance.insurance?.subject_type &&
@@ -339,6 +387,13 @@ const validateSubjectType = () => {
   }
 }
 
+/**
+ * Valida el campo 'description' (descripción de la póliza).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateDescription = () => {
   validationErrors.value.description.touched = true
   validationErrors.value.description.required = insuranceDto.value.description.trim() === ''
@@ -346,6 +401,17 @@ const validateDescription = () => {
   validationErrors.value.description.too_long = insuranceDto.value.description.length > 255
 }
 
+/**
+ * Crear o actualizar una póliza de seguro
+ *
+ * Usa el servicio `httpService` para enviar la Póliza a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const createinsurance = async () => {
   try {
     const response = await httpService.post('insurances', insuranceDto.value)
@@ -380,6 +446,17 @@ const createinsurance = async () => {
   }
 }
 
+/**
+ * Actualizar una póliza de seguro
+ *
+ * Usa el servicio `httpService` para enviar la Póliza a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const updateinsurance = async () => {
   try {
     const response = await httpService.put(
@@ -419,6 +496,10 @@ const updateinsurance = async () => {
     }
   }
 }
+/**
+ * Función de envío del formulario. Dependiendo de la presencia de `companyId`, realiza una actualización o una creación.
+ * @returns {void}
+ */
 const handleSubmit = () => {
   if (props.insurance.insurance.id > 0) {
     updateinsurance()

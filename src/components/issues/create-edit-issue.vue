@@ -1,3 +1,6 @@
+/* Componente para crear o editar una Incidencia. Si se pasa una Incidencia como prop, se editará.
+Si no se pasa una Incidencia, se creará una nueva. */
+
 <template>
   <h4 v-if="props.issue.issue.id > 0">(Creada: {{ formatDate(props.issue.issue.created_at) }})</h4>
   <form @submit.prevent="handleSubmit" class="container-fluid">
@@ -207,6 +210,13 @@ onMounted(async () => {
   }
 })
 
+/**
+ * Obtiene las Pólizas del usuario actual y las guarda en el estado `insurances`.
+ *
+ * Usa el servicio `httpService` para obtener las Pólizas del usuario actual y las guarda en el estado `insurances`.
+ *
+ * @returns {void}
+ */
 const fetchinsurances = async () => {
   try {
     const response = await httpService.get<InsuranceResponse[]>('get-my-insurances')
@@ -217,6 +227,12 @@ const fetchinsurances = async () => {
   }
 }
 
+/**
+ * Define las propiedades del componente.
+ *
+ * @property {IssueResponse} issue - Objeto de tipo IssueResponse que contiene los datos de la Incidencia.
+ * @returns {Object} - Objeto con las propiedades del componente.
+ */
 const props = defineProps({
   issue: {
     type: Object as () => IssueResponse,
@@ -279,14 +295,23 @@ const validationErrors = ref({
   description: { touched: false, required: false, too_short: false, too_long: false },
 })
 
+/**
+ * Comprueba si hay errores de validación en el formulario.
+ * @returns {boolean} - `true` si hay errores, `false` si no los hay.
+ */
 const validated = () => {
   return Object.values(validationErrors.value).some((field) =>
     Object.entries(field).some(([key, value]) => key !== 'touched' && value),
   )
 }
 
-// 🕵️‍♂️ Watchers individuales para cada campo
-
+/**
+ *  Valida el campo 'insurance_id' (ID de la Póliza).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateInsuranceId = () => {
   if (props.issue.insurance.id && props.issue.insurance.id != issueDto.value.insurance_id) {
     validationErrors.value.insurance_id.untouchableError = true
@@ -299,6 +324,13 @@ const validateInsuranceId = () => {
   }
 }
 
+/**
+ * Valida el estado de la Incidencia.
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateStatus = () => {
   if (props.issue.insurance.id === 0 && issueDto.value.status !== 'Abierta') {
     validationErrors.value.status.forceInitialState = true
@@ -311,6 +343,13 @@ const validateStatus = () => {
   }
 }
 
+/**
+ * Valida el campo 'description' (descripción de la incidencia).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateDescription = () => {
   validationErrors.value.description.touched = true
   validationErrors.value.description.required = issueDto.value.subject.trim() === ''
@@ -318,6 +357,17 @@ const validateDescription = () => {
   validationErrors.value.description.too_long = issueDto.value.subject.length > 255
 }
 
+/**
+ * Crea la Incidencia en la base de datos.
+ *
+ * Usa el servicio `httpService` para enviar la Incidencia a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const createIssue = async () => {
   try {
     const response = await httpService.post('issues', issueDto.value)
@@ -353,6 +403,17 @@ const createIssue = async () => {
   }
 }
 
+/**
+ * Actualiza la Incidencia en la API.
+ *
+ * Usa el servicio `httpService` para enviar la Incidencia a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la respuesta es exitosa, se muestra un mensaje de éxito.
+ * Si la respuesta indica un error, se muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const updateIssue = async () => {
   try {
     const response = await httpService.put(`issues/${props.issue.issue.id}`, issueDto.value)
@@ -387,6 +448,11 @@ const updateIssue = async () => {
     }
   }
 }
+
+/**
+ * Función de envío del formulario. Dependiendo de la presencia de `companyId`, realiza una actualización o una creación.
+ * @returns {void}
+ */
 const handleSubmit = () => {
   if (props.issue.issue.id > 0) {
     updateIssue()

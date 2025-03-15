@@ -1,3 +1,8 @@
+/* Componente que muestra el detalle de una Incidencia. Se encarga de obtener la Incidencia desde la
+API y mostrarla en un formulario de edición. Si el usuario no tiene permisos para ver la Incidencia,
+se muestra un mensaje de error 403. Si la Incidencia no existe, se muestra un mensaje de error 404.
+*/
+
 <template>
   <!-- Estado de carga -->
   <div v-if="loadingIssue" class="pt-5 mt-5 text-center">
@@ -70,6 +75,15 @@ onMounted(() => {
   }
 })
 
+/**
+ * Función que obtiene la Incidencia desde la API y la almacena en la variable IssueDetail.
+ *
+ * Usa el servicio HttpService para hacer la petición a la API.
+ *
+ * Si el usuario no tiene permisos para ver la Incidencia, se muestra un mensaje de error 403.
+ *
+ * @returns {void}
+ */
 const fetchIssue = async () => {
   loadingIssue.value = true
   try {

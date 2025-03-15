@@ -1,3 +1,7 @@
+/* Este componente es el encargado de mostrar todas las incidencias que se han creado en la
+aplicación. Se muestra una tabla con la información de cada incidencia y se permite filtrar por
+diferentes campos. Además, se permite eliminar una incidencia desde este componente. Incluye un
+search bar para filtrar las incidencias */
 <template>
   <div class="container-fluid px-3">
     <div class="row justify-content-space-evenly align-items-center">
@@ -126,6 +130,14 @@ watch(searchString, (newVal) => {
   }
 })
 
+/**
+ * Función que se encarga de obtener todas las incidencias de la base de datos.
+ * Se almacenan en el array issues y en el array filteredIssues.
+ *
+ * Usa el servicio HttpService para hacer la petición a la API.
+ *
+ * @returns {void}
+ */
 const fetchIssues = async () => {
   loadingIssues.value = true
   try {
@@ -141,6 +153,12 @@ const fetchIssues = async () => {
   }
 }
 
+/**
+ * Función que se encarga de eliminar una incidencia de la base de datos.
+ * Se muestra un mensaje de éxito o error en función de si se ha eliminado correctamente.
+ * @param id ID de la incidencia a eliminar
+ * @returns {void}
+ */
 const deleteIssue = async (id: number) => {
   try {
     const response = await httpService.delete(`issues/${id}`)

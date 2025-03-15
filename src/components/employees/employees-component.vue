@@ -1,3 +1,5 @@
+/* Componente que contiene la vista de la lista de empleados de una aseguradora concreta y el botón
+para agregar un nuevo empleado a la plataforma. */
 <template>
   <div class="container-fluid">
     <div class="row w-100 align-items-end">

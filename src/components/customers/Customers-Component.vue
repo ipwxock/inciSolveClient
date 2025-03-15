@@ -1,3 +1,4 @@
+/* Componente padre que contiene la vista de la sección de clientes. */
 <template>
   <div class="container-fluid">
     <div class="row w-100 align-items-end">

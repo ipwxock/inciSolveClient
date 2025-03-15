@@ -1,3 +1,6 @@
+/* Este componente es un formulario para crear o editar empleados. Se encarga de validar los campos
+del formulario y de enviar la petición al servidor. Si se está editando un empleado, se deshabilitan
+los campos DNI y email para evitar que se modifiquen. */
 <template>
   <form @submit.prevent="handleSubmit" class="row">
     <div class="col-12 col-md-6 mb-3">
@@ -163,6 +166,12 @@ const showRequestResult = ref({
 
 const httpService = new HttpService()
 
+/**
+ * Propiedades del componente.
+ *
+ * @property {DetailEmployeeResponse} employee - Objeto de tipo DetailEmployeeResponse que contiene los datos del empleado.
+ * @returns {Object} - Objeto con las propiedades del componente.
+ */
 const props = defineProps({
   employee: {
     type: Object as () => DetailEmployeeResponse,
@@ -214,14 +223,26 @@ const validationErrors = ref({
   phone_number: { touched: false, required: false, pattern: false },
 })
 
+/**
+ * Comprueba si el formulario es válido.
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {boolean} - `true` si el formulario es válido, `false` en caso contrario.
+ */
 const validated = () => {
   return Object.values(validationErrors.value).every((field) =>
     Object.entries(field).every(([key, value]) => key === 'touched' || !value),
   )
 }
 
-// 🕵️‍♂️ Watchers individuales para cada campo
-
+/**
+ * Valida el campo 'dni' (DNI del Empleado).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateDNI = () => {
   if (props.employee.user.id && props.employee.user.dni != employeeDto.value.dni) {
     validationErrors.value.dni.untouchableError = true
@@ -233,6 +254,13 @@ const validateDNI = () => {
   }
 }
 
+/**
+ * Valida el campo 'first_name' (nombre del Empleado).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateFirstName = () => {
   validationErrors.value.first_name.touched = true
   validationErrors.value.first_name.required = employeeDto.value.first_name.trim() === ''
@@ -240,6 +268,13 @@ const validateFirstName = () => {
   validationErrors.value.first_name.too_long = employeeDto.value.first_name.length > 50
 }
 
+/**
+ * Valida el campo 'last_name' (apellido del Empleado).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateLastName = () => {
   validationErrors.value.last_name.touched = true
   validationErrors.value.last_name.required = employeeDto.value.last_name.trim() === ''
@@ -247,6 +282,13 @@ const validateLastName = () => {
   validationErrors.value.last_name.too_long = employeeDto.value.last_name.length > 50
 }
 
+/**
+ * Valida el campo 'email' (email del Empleado).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateEmail = () => {
   if (props.employee.user.id && props.employee.user.email != employeeDto.value.email) {
     validationErrors.value.dni.untouchableError = true
@@ -259,6 +301,17 @@ const validateEmail = () => {
   }
 }
 
+/**
+ * Función para crear un empleado.
+ *
+ * Usa el servicio `httpService` para enviar al Empleado a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const createemployee = async () => {
   try {
     const response = await httpService.post('users', employeeDto.value)
@@ -299,6 +352,17 @@ const createemployee = async () => {
   }
 }
 
+/**
+ * Función para modificar un empleado.
+ *
+ * Usa el servicio `httpService` para enviar al Empleado a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la response es exitosa, muestra un mensaje de éxito.
+ * Si la response indica un error, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const updateemployee = async () => {
   try {
     const response = await httpService.put(`users/${props.employee.user.id}`, employeeDto.value)
@@ -346,6 +410,10 @@ const updateemployee = async () => {
   }
 }
 
+/**
+ * Función de envío del formulario. Dependiendo de la presencia de `companyId`, realiza una actualización o una creación.
+ * @returns {void}
+ */
 const handleSubmit = () => {
   if (props.employee.user.id) {
     updateemployee()

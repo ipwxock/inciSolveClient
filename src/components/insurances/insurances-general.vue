@@ -1,38 +1,6 @@
-<script lang="ts" setup>
-import { HttpService } from '@/services/httpService'
-import type { InsuranceResponse } from '@/types/Responses.type'
-import { onMounted, ref } from 'vue'
-import Unauthorized403 from '../Errors/Unauthorized-403.vue'
-import { formatDate } from '@/utils/date'
-
-const httpService = new HttpService()
-const insurances = ref<InsuranceResponse[] | null>(null)
-const unauthorizedUser = ref(false)
-const userRole = localStorage.getItem('role')
-const loadingInsurances = ref(false)
-
-onMounted(async () => {
-  try {
-    await fetchInsurances()
-  } catch (error) {
-    console.error('Error fetching insurances:', error)
-  }
-})
-
-const fetchInsurances = async () => {
-  loadingInsurances.value = true
-  try {
-    const response = await httpService.get<InsuranceResponse[]>('get-my-insurances')
-    if (response.status === 200) {
-      insurances.value = response.data ?? null
-    }
-  } catch (error) {
-    console.error('Error fetching insurances:', error)
-  } finally {
-    loadingInsurances.value = false
-  }
-}
-</script>
+/* Este componente se encarga de mostrar las pólizas de un usuario. Si el usuario está autorizado,
+podrá ver todas sus pólizas, tanto como Empleado/Manager como Cliente. Si el usuario no está
+autorizado, se mostrará un componente de error. */
 
 <template>
   <div v-if="loadingInsurances" class="pt-5 mt-5 text-center">
@@ -84,3 +52,46 @@ const fetchInsurances = async () => {
     </div>
   </div>
 </template>
+
+<script lang="ts" setup>
+import { HttpService } from '@/services/httpService'
+import type { InsuranceResponse } from '@/types/Responses.type'
+import { onMounted, ref } from 'vue'
+import Unauthorized403 from '../Errors/Unauthorized-403.vue'
+import { formatDate } from '@/utils/date'
+
+const httpService = new HttpService()
+const insurances = ref<InsuranceResponse[] | null>(null)
+const unauthorizedUser = ref(false)
+const userRole = localStorage.getItem('role')
+const loadingInsurances = ref(false)
+
+onMounted(async () => {
+  try {
+    await fetchMyInsurances()
+  } catch (error) {
+    console.error('Error fetching insurances:', error)
+  }
+})
+
+/**
+ * Recupera todas las pólizas de Incisolve que pertenecen al usuario.
+ *
+ * Usa el servicio HttpService para hacer la petición a la API.
+ *
+ * @returns {void}
+ */
+const fetchMyInsurances = async () => {
+  loadingInsurances.value = true
+  try {
+    const response = await httpService.get<InsuranceResponse[]>('get-my-insurances')
+    if (response.status === 200) {
+      insurances.value = response.data ?? null
+    }
+  } catch (error) {
+    console.error('Error fetching insurances:', error)
+  } finally {
+    loadingInsurances.value = false
+  }
+}
+</script>

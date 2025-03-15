@@ -1,3 +1,7 @@
+/* Este componente se encarga de mostrar todos los empleados que tiene registrados el usuario en la
+plataforma. Se muestra una tabla con los datos de los empleados y un botón para ver el detalle de
+cada empleado. Si el usuario no tiene permisos para ver esta página, se muestra un mensaje de error.
+*/
 <template>
   <div v-if="loadingEmployees" class="pt-5 mt-5 text-center">
     <div class="spinner-border text-primary" role="status">
@@ -9,6 +13,11 @@
       <Unauthorized403 />
     </div>
     <div v-else>
+      <p>
+        En esta sección podrás visualizar todos los empleados que tienes registrados en el sistema.
+        Esto es, todos los empleados que has registrado en el sistema y tienen acceso a la
+        plataforma.
+      </p>
       <section class="table-responsive">
         <table v-if="employees !== null" class="table table-striped">
           <thead>
@@ -53,6 +62,10 @@ const employees = ref<EmployeeResponse[] | null>(null)
 const unauthorizedUser = ref(false)
 const loadingEmployees = ref(true)
 
+/**
+ * Obtiene todos los empleados de la aseguradora del usuario logueado (Manager).
+ * Si no hay empleados, se muestra un mensaje indicando que no se encontraron empleados.
+ */
 onMounted(async () => {
   try {
     loadingEmployees.value = true

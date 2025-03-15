@@ -1,3 +1,6 @@
+/* Este componente se encarga de renderizar el formulario de creación de una entidad en el panel de
+administración. Se encarga de renderizar el componente correspondiente a la entidad que se quiere
+crear. */
 <template>
   <div class="container-fluid">
     <div

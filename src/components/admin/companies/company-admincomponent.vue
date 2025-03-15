@@ -1,3 +1,9 @@
+/** * Componente CompanyAdminComponent * @description Componente que se encarga de mostrar la lista
+de aseguradoras que se encuentran en la base de datos. * Se puede buscar por nombre, descripción o
+teléfono de la aseguradora. * * @example *
+<company-admincomponent></company-admincomponent>
+*/
+
 <template>
   <div class="container-fluid px-md-3">
     <div class="row justify-content-space-evenly align-items-center">
@@ -98,6 +104,14 @@ watch(searchString, (newVal) => {
   }
 })
 
+/**
+ * Función que se encarga de obtener las aseguradoras de la base de datos.
+ * Se almacenan en la variable companies y filteredCompanies.
+ *
+ * Usa el servicio HttpService para hacer la petición a la API.
+ *
+ * @returns {void}
+ */
 const fetchCompanies = async () => {
   try {
     const response = await httpService.get<Company[]>('companies')
@@ -110,6 +124,11 @@ const fetchCompanies = async () => {
   }
 }
 
+/**
+ * Función que se encarga de eliminar una aseguradora de la base de datos.
+ * @param id ID de la aseguradora a eliminar.
+ * @returns {void}
+ */
 const deleteCompany = async (id: number) => {
   try {
     const response = await httpService.delete(`companies/${id}`)

@@ -1,3 +1,6 @@
+/* Este componente permite crear o editar un cliente. Si se le pasa un cliente existente, se
+mostrarán sus datos y se permitirá modificarlos. Si no, se mostrará un formulario vacío para crear
+un nuevo cliente. */
 <template>
   <form @submit.prevent="handleSubmit" class="row">
     <div class="col-12 col-md-4 mb-3">
@@ -219,6 +222,14 @@ const showRequestResult = ref({
 
 const httpService = new HttpService()
 
+/**
+ * Propiedades del componente.
+ *
+ * @property {Object} customer - Cliente a editar. Si no se pasa, se creará un nuevo cliente.
+ * @property {Object} customer.user - Datos del usuario.
+ * @property {Object} customer.customer - Datos del cliente.
+ *
+ */
 const props = defineProps({
   customer: {
     type: Object as () => DetailCustomerResponse,
@@ -238,6 +249,7 @@ const props = defineProps({
   },
 })
 
+// DTO para el cliente
 const customerDto = ref<CustomerDTO>({
   dni: '',
   first_name: '',
@@ -273,14 +285,26 @@ const validationErrors = ref({
   phone_number: { touched: false, required: false, pattern: false },
 })
 
+/**
+ * Valida si el formulario es válido.
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {boolean}
+ */
 const validated = () => {
   return Object.values(validationErrors.value).every((field) =>
     Object.entries(field).every(([key, value]) => key === 'touched' || !value),
   )
 }
 
-// 🕵️‍♂️ Watchers individuales para cada campo
-
+/**
+ * Valida el campo 'dni' (DNI del Cliente).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateDNI = () => {
   if (props.customer.user.id && props.customer.user.dni != customerDto.value.dni) {
     validationErrors.value.dni.untouchableError = true
@@ -292,6 +316,13 @@ const validateDNI = () => {
   }
 }
 
+/**
+ * Valida el campo 'first_name' (nombre del Cliente).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateFirstName = () => {
   validationErrors.value.first_name.touched = true
   validationErrors.value.first_name.required = customerDto.value.first_name.trim() === ''
@@ -299,6 +330,13 @@ const validateFirstName = () => {
   validationErrors.value.first_name.too_long = customerDto.value.first_name.length > 50
 }
 
+/**
+ * Valida el campo 'last_name' (apellido del Cliente).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateLastName = () => {
   validationErrors.value.last_name.touched = true
   validationErrors.value.last_name.required = customerDto.value.last_name.trim() === ''
@@ -306,6 +344,13 @@ const validateLastName = () => {
   validationErrors.value.last_name.too_long = customerDto.value.last_name.length > 50
 }
 
+/**
+ * Valida el campo 'address' (dirección del Cliente).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateAddress = () => {
   validationErrors.value.address.touched = true
   validationErrors.value.address.required = customerDto.value.address.trim() === ''
@@ -313,6 +358,13 @@ const validateAddress = () => {
   validationErrors.value.address.too_long = customerDto.value.address.length > 100
 }
 
+/**
+ * Valida el campo 'email' (email del Cliente).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validateEmail = () => {
   if (props.customer.user.id && props.customer.user.email != customerDto.value.email) {
     validationErrors.value.dni.untouchableError = true
@@ -325,12 +377,30 @@ const validateEmail = () => {
   }
 }
 
+/**
+ * Valida el campo 'phone_number' (teléfono del Cliente).
+ *
+ * Usa el objeto `validationErrors` para mostrar mensajes de error.
+ *
+ * @returns {void}
+ */
 const validatePhoneNumber = () => {
   validationErrors.value.phone_number.touched = true
   validationErrors.value.phone_number.required = customerDto.value.phone_number.trim() === ''
   validationErrors.value.phone_number.pattern = !/^[0-9]{9}$/.test(customerDto.value.phone_number)
 }
 
+/**
+ * Crea un cliente
+ *
+ * Usa el servicio `httpService` para enviar la Incidencia a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la petición es exitosa, muestra un mensaje de éxito.
+ * Si la petición falla, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const createCustomer = async () => {
   try {
     const response = await httpService.post('users', customerDto.value)
@@ -371,6 +441,17 @@ const createCustomer = async () => {
   }
 }
 
+/**
+ * Actualiza un cliente
+ *
+ * Usa el servicio `httpService` para enviar la Incidencia a la API.
+ * Usa el objeto showRequestResult para mostrar mensajes de éxito o error.
+ *
+ * Si la petición es exitosa, muestra un mensaje de éxito.
+ * Si la petición falla, muestra un mensaje de error.
+ *
+ * @returns {void}
+ */
 const updateCustomer = async () => {
   try {
     const response = await httpService.put(`users/${props.customer.user.id}`, customerDto.value)
@@ -417,6 +498,10 @@ const updateCustomer = async () => {
   }
 }
 
+/**
+ * Función de envío del formulario. Dependiendo de la presencia de `companyId`, realiza una actualización o una creación.
+ * @returns {void}
+ */
 const handleSubmit = () => {
   if (props.customer.user.id) {
     updateCustomer()

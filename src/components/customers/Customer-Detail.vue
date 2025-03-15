@@ -1,3 +1,5 @@
+/* Componente para mostrar el detalle de un cliente - Muestra los datos del cliente - Muestra las
+pólizas del cliente - Muestra las incidencias del cliente - Permite eliminar un cliente */
 <template>
   <div class="container">
     <!-- Estado de carga -->
@@ -20,14 +22,21 @@
               <h3><strong>Datos Cliente</strong></h3>
             </div>
             <div class="col-12 col-md-6 pb-5 text-end">
-              <div
-                v-if="showDeleteResult.show"
-                :class="showDeleteResult.success ? 'alert alert-success' : 'alert alert-danger'"
-                role="alert"
-              >
-                {{ showDeleteResult.message }}
+              <div class="container">
+                <div class="row">
+                  <div
+                    class="col-8"
+                    v-if="showDeleteResult.show"
+                    :class="showDeleteResult.success ? 'alert alert-success' : 'alert alert-danger'"
+                    role="alert"
+                  >
+                    {{ showDeleteResult.message }}
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <a @click="deleteCustomer()" class="btn btn-danger w-100">Eliminar Cliente</a>
+                  </div>
+                </div>
               </div>
-              <a @click="deleteCustomer()" class="btn btn-danger">Eliminar Cliente</a>
             </div>
 
             <CreateEditCustomer :customer="customerDetail" />
@@ -50,7 +59,9 @@
                       <td>{{ formatDate(insurance.created_at) }}</td>
                       <td>{{ insurance.description }}</td>
                       <td>
-                        <a :href="'/insurances/' + insurance.id" class="btn btn-primary me-1"
+                        <a
+                          :href="'/insurances/' + insurance.id + '/see'"
+                          class="btn btn-primary me-1"
                           >Ver Detalle</a
                         >
                       </td>
@@ -121,6 +132,13 @@ onMounted(() => {
   fetchCustomer()
 })
 
+/**
+ * Función para obtener los datos del cliente
+ *
+ * Usa el servicio HttpService para obtener los datos del cliente usando su ID
+ *
+ * @returns {void}
+ */
 const fetchCustomer = async () => {
   const customerId = route.params.id as string
 
@@ -149,35 +167,16 @@ const fetchCustomer = async () => {
   }
 }
 
+/**
+ * Función para eliminar un cliente
+ * @returns {void}
+ */
 const deleteCustomer = async () => {
-  try {
-    const response = await httpService.delete(`customers/${route.params.id}/delete-customer`)
-    if (response.status === 200) {
-      showDeleteResult.value = {
-        show: true,
-        success: true,
-        message: 'Cliente eliminado correctamente',
-      }
-    } else if (response.status === 403) {
-      showDeleteResult.value = {
-        show: true,
-        success: false,
-        message: 'No tienes permisos para eliminar el cliente',
-      }
-    } else if (response.status === 400) {
-      showDeleteResult.value = {
-        show: true,
-        success: false,
-        message: 'No se puede eliminar el cliente porque tiene pólizas asociadas',
-      }
-    }
-  } catch (error) {
-    console.error('Error deleting customer:', error)
-    showDeleteResult.value = {
-      show: true,
-      success: false,
-      message: 'Error al eliminar el cliente',
-    }
+  showDeleteResult.value = {
+    show: true,
+    success: false,
+    message:
+      'Para eliminar un cliente, simplemente debe eliminar todas las Pólizas que le ha hecho.',
   }
 }
 </script>
