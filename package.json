@@ -49,9 +49,8 @@
     "bootstrap": "^5.3.3",
     "vue-router": "^4.5.0"
   },
-  "eslintConfig": {
-    "extends": [
-      "plugin:storybook/recommended"
-    ]
+  "eslintConfig": {},
+  "overrides": {
+    "glob": "^10.5.0"
   }
 }
